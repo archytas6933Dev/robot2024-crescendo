@@ -15,27 +15,31 @@ import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.SensorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
 public class RobotContainer 
 {
 
-  private final SensorSubsystem sensorsubsystem;
+  private final SensorSubsystem sensorSubsystem;
   private final SwerveSubsystem swerveSubsystem;
-  private final ShooterSubsystem shootersubsystem;
+  private final ShooterSubsystem shooterSubsystem;
+  private final IntakeSubsystem intakeSubsystem;
 
   private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
 
   public RobotContainer() 
   {
-    sensorsubsystem = new SensorSubsystem();
-    swerveSubsystem = new SwerveSubsystem(sensorsubsystem);
-    shootersubsystem = new ShooterSubsystem();
+    sensorSubsystem = new SensorSubsystem();
+    swerveSubsystem = new SwerveSubsystem(sensorSubsystem);
+    shooterSubsystem = Constants.Shooter.EXISTS ? new ShooterSubsystem():null;
+    intakeSubsystem = Constants.Intake.EXISTS ? new IntakeSubsystem():null;
 
     swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
         driverJoystick, 
         swerveSubsystem, 
-        sensorsubsystem,
-        shootersubsystem));
+        sensorSubsystem,
+        shooterSubsystem,
+        intakeSubsystem));
 
     configureBindings();
 

@@ -114,4 +114,28 @@ public class Constants {
 
         public static final double kDeadband = 0.05;
     }
+    public static final class Shooter {
+       public static final boolean EXISTS = false;
+       public static final double MOTOR_VELOCITY_F = 0.011; //0.011;
+       public static final double MOTOR_VELOCITY_P = 0.025;
+       public static final double MOTOR_VELOCITY_I = 0.0;
+       public static final double MOTOR_VELOCITY_D = 0.0;
+       public static final int MOTOR_ID = 0;
+       public static final int FOLLOWER_ID = 0;
+       public static final long SHOTTOTALTIME = 2000; // in milliseconds
+
+    }
+    public static final class Intake {
+        public static final boolean EXISTS = false;
+        public static final int MOTOR_ID = 0;
+        public static final double MOTOR_POSITION_F = 0.0;
+        public static final double MOTOR_POSITION_P = 0.5;
+        public static final double MOTOR_POSITION_I = 0.0;
+        public static final double MOTOR_POSITION_D = 5.0;
+        public static final double INTAKE_SPEED = .7;
+        public static final double FEED_SPEED = .69;
+        public static final double SPIT_SPEED = -0.3;
+        public static final int SWITCH1_ID = 0;
+        public static final int SWITCH2_ID = 0;
+    }
 }

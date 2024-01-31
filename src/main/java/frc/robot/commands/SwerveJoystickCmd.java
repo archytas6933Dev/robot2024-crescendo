@@ -16,13 +16,15 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.SensorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+
 
 public class SwerveJoystickCmd extends Command 
 {
 
   private final SwerveSubsystem swerveSubsystem;
   private final SensorSubsystem sensorSubsystem;
-  private final ShooterSubsystem shootersubsystem;
+  private final ShooterSubsystem shooterSubsystem;
 
   private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
   private final Joystick driverJoystick;
@@ -31,13 +33,14 @@ public class SwerveJoystickCmd extends Command
     Joystick driverJoystick, 
     SwerveSubsystem swerveSubsystem, 
     SensorSubsystem sensorSubsystem,
-    ShooterSubsystem shootersubsystem)
+    ShooterSubsystem shootersubsystem,
+    IntakeSubsystem intakeSubsystem)
   
 {
     this.driverJoystick = driverJoystick;   
     this.sensorSubsystem = sensorSubsystem;
     this.swerveSubsystem = swerveSubsystem;
-    this.shootersubsystem = shootersubsystem;
+    this.shooterSubsystem = shootersubsystem;
     this.xLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
     this.yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
     this.turningLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAngularAccelerationUnitsPerSecond);
@@ -106,7 +109,6 @@ public class SwerveJoystickCmd extends Command
       turnSpeed = sensorSubsystem.targetX/80;    
       turnSpeed = Math.abs(turnSpeed) > OIConstants.kDeadband ? turnSpeed : 0.0;
     }
-
     xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;
     ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;
     turnSpeed = turningLimiter.calculate(turnSpeed) * DriveConstants.kTeleDriveMaxAngularSpeedRadiansPerSecond;
@@ -120,6 +122,11 @@ public class SwerveJoystickCmd extends Command
     {
       chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, turnSpeed);
     }
+    if((sensorSubsystem.obstacle1 < 36) && (chassisSpeeds.vyMetersPerSecond>0))
+    {
+      chassisSpeeds.vyMetersPerSecond /= 16/(sensorSubsystem.obstacle1-20);
+    }
+        SmartDashboard.putNumber("Y Speed2", chassisSpeeds.vyMetersPerSecond);
 
     SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
 
