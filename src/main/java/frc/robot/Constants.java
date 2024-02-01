@@ -5,7 +5,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
-    public static final class ModuleConstants {
+    public static final class Swerve {
         public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
         public static final double kDriveMotorGearRatio = 1 / 5.8462;
         public static final double kTurningMotorGearRatio = 1 / 18.0;
@@ -16,7 +16,7 @@ public class Constants {
         public static final double kPTurning = 0.5;
     }
 
-    public static final class DriveConstants {
+    public static final class Drive {
 
         public static final double kTrackWidth = Units.inchesToMeters(21);
         // Distance between right and left wheels
@@ -72,10 +72,10 @@ public class Constants {
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 8; //3;
     }
 
-    public static final class AutoConstants {
-        public static final double kMaxSpeedMetersPerSecond = DriveConstants.kPhysicalMaxSpeedMetersPerSecond / 4;
+    public static final class Auto {
+        public static final double kMaxSpeedMetersPerSecond = Drive.kPhysicalMaxSpeedMetersPerSecond / 4;
         public static final double kMaxAngularSpeedRadiansPerSecond = //
-                DriveConstants.kPhysicalMaxAngularSpeedRadiansPerSecond / 10;
+                Drive.kPhysicalMaxAngularSpeedRadiansPerSecond / 10;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
         public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI / 4;
         public static final double kPXController = 1.5;
@@ -88,8 +88,10 @@ public class Constants {
                         kMaxAngularAccelerationRadiansPerSecondSquared);
     }
 
-    public static final class OIConstants {
+    public static final class Control {
         public static final int kDriverControllerPort = 0;
+        public static final int kOperatorControllerPort = 1;
+
 
         public static int ABUTTON = 1;
         public static int BBUTTON = 2;
@@ -101,11 +103,14 @@ public class Constants {
         public static int STARTBUTTON = 8;
         public static int LEFTJOYCLICK = 9;
         public static int RIGHTJOYCLICK = 10;
-    
-        public static final int kDriverYAxis = 1;
-        public static final int kDriverXAxis = 0;
-        public static final int kDriverRotXAxis = 4;
-        public static final int kDriverRotYAxis = 5;
+
+        
+        public static final int LEFT_Y_AXIS = 1;
+        public static final int LEFT_X_AXIS = 0;
+        public static final int LEFT_TRIGGER = 2;
+        public static final int RIGHT_TRIGGER = 3;
+        public static final int RIGHT_X_AXIS = 4;
+        public static final int RIGHT_Y_AXIS = 5;
 
         public static final int DAXISN = 0;
         public static final int DAXISS = 180;

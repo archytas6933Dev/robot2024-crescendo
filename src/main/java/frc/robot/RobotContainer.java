@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.Control;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.SensorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -25,7 +25,9 @@ public class RobotContainer
   private final ShooterSubsystem shooterSubsystem;
   private final IntakeSubsystem intakeSubsystem;
 
-  private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
+  private final Joystick driverJoystick = new Joystick(Control.kDriverControllerPort);
+  private final Joystick operatorJoystick = new Joystick(Control.kOperatorControllerPort);
+
 
   public RobotContainer() 
   {
@@ -35,7 +37,8 @@ public class RobotContainer
     intakeSubsystem = Constants.Intake.EXISTS ? new IntakeSubsystem():null;
 
     swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
-        driverJoystick, 
+        driverJoystick,
+        operatorJoystick, 
         swerveSubsystem, 
         sensorSubsystem,
         shooterSubsystem,
@@ -48,7 +51,7 @@ public class RobotContainer
 
   private void configureBindings() 
   {
-    new JoystickButton(driverJoystick, OIConstants.STARTBUTTON).onTrue( new InstantCommand( () -> swerveSubsystem.zeroHeading()));
+    new JoystickButton(driverJoystick, Control.STARTBUTTON).onTrue( new InstantCommand( () -> swerveSubsystem.zeroHeading()));
   }
 
   public Command getAutonomousCommand() {

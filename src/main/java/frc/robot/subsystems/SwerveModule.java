@@ -16,8 +16,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.Constants.ModuleConstants;
-import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.Swerve;
+import frc.robot.Constants.Drive;
 
 
 public class SwerveModule {
@@ -63,13 +63,13 @@ public class SwerveModule {
         driveEncoder = driveMotor.getEncoder();
         turningEncoder = turningMotor.getEncoder();
 
-        driveEncoder.setPositionConversionFactor(ModuleConstants.kDriveEncoderRot2Meter);
-        driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveEncoderRPM2MeterPerSec);
+        driveEncoder.setPositionConversionFactor(Swerve.kDriveEncoderRot2Meter);
+        driveEncoder.setVelocityConversionFactor(Swerve.kDriveEncoderRPM2MeterPerSec);
 
-        turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad);
-        turningEncoder.setVelocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec);
+        turningEncoder.setPositionConversionFactor(Swerve.kTurningEncoderRot2Rad);
+        turningEncoder.setVelocityConversionFactor(Swerve.kTurningEncoderRPM2RadPerSec);
         
-        turningPidController = new PIDController(ModuleConstants.kPTurning, 0, 0);
+        turningPidController = new PIDController(Swerve.kPTurning, 0, 0);
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoder();
@@ -127,7 +127,7 @@ public class SwerveModule {
         }
 
         state = SwerveModuleState.optimize(state, getState().angle);
-        driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
+        driveMotor.set(state.speedMetersPerSecond / Drive.kPhysicalMaxSpeedMetersPerSecond);
         turningMotor.set(turningPidController.calculate(getTurningPosition(),state.angle.getRadians()));
     }
 

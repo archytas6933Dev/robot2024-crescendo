@@ -9,7 +9,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SensorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.Drive;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.Constants;
 
@@ -41,7 +41,7 @@ public class AutoIntakeCommand extends Command {
     double xSpeed = 0;
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, 0);
 
-    SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+    SwerveModuleState[] moduleStates = Drive.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
     swerveSubsystem.setModuleStates(moduleStates);
     intakeSubsystem.setIntakeSpeed(Constants.Intake.INTAKE_SPEED);
   }

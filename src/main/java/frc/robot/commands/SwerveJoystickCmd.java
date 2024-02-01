@@ -11,8 +11,10 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.Drive;
+import frc.robot.Constants.Intake;
+import frc.robot.Constants;
+import frc.robot.Constants.Control;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.SensorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -25,12 +27,16 @@ public class SwerveJoystickCmd extends Command
   private final SwerveSubsystem swerveSubsystem;
   private final SensorSubsystem sensorSubsystem;
   private final ShooterSubsystem shooterSubsystem;
+  private final IntakeSubsystem intakeSubsystem;
 
   private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
-  private final Joystick driverJoystick;
+  private final Joystick driverJoystick, operatorJoystick;
+
+  private double shotSpeed;
   
   public SwerveJoystickCmd(
     Joystick driverJoystick, 
+    Joystick operatorJoystick,
     SwerveSubsystem swerveSubsystem, 
     SensorSubsystem sensorSubsystem,
     ShooterSubsystem shootersubsystem,
@@ -38,31 +44,35 @@ public class SwerveJoystickCmd extends Command
   
 {
     this.driverJoystick = driverJoystick;   
+    this.operatorJoystick = operatorJoystick;   
+
+    this.intakeSubsystem = intakeSubsystem;
     this.sensorSubsystem = sensorSubsystem;
     this.swerveSubsystem = swerveSubsystem;
     this.shooterSubsystem = shootersubsystem;
-    this.xLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
-    this.yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
-    this.turningLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAngularAccelerationUnitsPerSecond);
+    this.xLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAccelerationUnitsPerSecond);
+    this.yLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAccelerationUnitsPerSecond);
+    this.turningLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAngularAccelerationUnitsPerSecond);
     addRequirements(swerveSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    SmartDashboard.putNumber("Shot Speed", 0);
+
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() 
   {
-    // double shotspeed = driverJoystick.getRawAxis(OIConstants.kDriverYAxis);
-    // shootersubsystem.setshotspeed(shotspeed);
 
-    double xSpeed = driverJoystick.getRawAxis(OIConstants.kDriverXAxis);
-    double ySpeed = -driverJoystick.getRawAxis(OIConstants.kDriverYAxis);
-    double xTurn = driverJoystick.getRawAxis(OIConstants.kDriverRotXAxis);
-    double yTurn = driverJoystick.getRawAxis(OIConstants.kDriverRotYAxis);
-    boolean isFieldCentric = !driverJoystick.getRawButton(OIConstants.LBBUTTON);
+    double xSpeed = driverJoystick.getRawAxis(Control.LEFT_X_AXIS);
+    double ySpeed = -driverJoystick.getRawAxis(Control.LEFT_Y_AXIS);
+    double xTurn = driverJoystick.getRawAxis(Control.RIGHT_X_AXIS);
+    double yTurn = driverJoystick.getRawAxis(Control.RIGHT_Y_AXIS);
+    boolean isFieldCentric = !driverJoystick.getRawButton(Control.LBBUTTON);
 
     double targetRotation = Math.toDegrees(Math.atan2(-xTurn,yTurn)) % 360;
     double turnSpeed = 0;
@@ -78,12 +88,12 @@ public class SwerveJoystickCmd extends Command
     }
 
 
-    xSpeed = Math.abs(xSpeed) > OIConstants.kDeadband ? xSpeed : 0.0;
-    ySpeed = Math.abs(ySpeed) > OIConstants.kDeadband ? ySpeed : 0.0;
-    turnSpeed = Math.abs(turnSpeed) > OIConstants.kDeadband ? turnSpeed : 0.0;
+    xSpeed = Math.abs(xSpeed) > Control.kDeadband ? xSpeed : 0.0;
+    ySpeed = Math.abs(ySpeed) > Control.kDeadband ? ySpeed : 0.0;
+    turnSpeed = Math.abs(turnSpeed) > Control.kDeadband ? turnSpeed : 0.0;
    
     //precision mode
-    if(driverJoystick.getRawButton(OIConstants.RBBUTTON)){
+    if(driverJoystick.getRawButton(Control.RBBUTTON)){
       xSpeed /= 4;
       ySpeed /= 4;
       turnSpeed /= 4;
@@ -94,24 +104,24 @@ public class SwerveJoystickCmd extends Command
 
     int pov = driverJoystick.getPOV();
 
-    if(pov == OIConstants.DAXISN){
+    if(pov == Control.DAXISN){
       isFieldCentric = false;
       xSpeed = sensorSubsystem.targetX / 60;
       ySpeed = sensorSubsystem.targetY / 60;
-      xSpeed = Math.abs(xSpeed) > OIConstants.kDeadband ? xSpeed : 0.0;
-      ySpeed = Math.abs(ySpeed) > OIConstants.kDeadband ? ySpeed : 0.0;
+      xSpeed = Math.abs(xSpeed) > Control.kDeadband ? xSpeed : 0.0;
+      ySpeed = Math.abs(ySpeed) > Control.kDeadband ? ySpeed : 0.0;
       turnSpeed = sensorSubsystem.targetRot / 900;
       if ((sensorSubsystem.currentX == 0) && (sensorSubsystem.currentY == 0)) {
         xSpeed = turnSpeed > 0 ? -0.3 : 0.3; // if invisible, slide left/right logically
       }
     }
-    else if (pov == OIConstants.DAXISS) {
+    else if (pov == Control.DAXISS) {
       turnSpeed = sensorSubsystem.targetX/80;    
-      turnSpeed = Math.abs(turnSpeed) > OIConstants.kDeadband ? turnSpeed : 0.0;
+      turnSpeed = Math.abs(turnSpeed) > Control.kDeadband ? turnSpeed : 0.0;
     }
-    xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;
-    ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;
-    turnSpeed = turningLimiter.calculate(turnSpeed) * DriveConstants.kTeleDriveMaxAngularSpeedRadiansPerSecond;
+    xSpeed = xLimiter.calculate(xSpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
+    ySpeed = yLimiter.calculate(ySpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
+    turnSpeed = turningLimiter.calculate(turnSpeed) * Drive.kTeleDriveMaxAngularSpeedRadiansPerSecond;
 
     ChassisSpeeds chassisSpeeds;
     if (isFieldCentric)
@@ -128,13 +138,43 @@ public class SwerveJoystickCmd extends Command
     }
         SmartDashboard.putNumber("Y Speed2", chassisSpeeds.vyMetersPerSecond);
 
-    SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+    SwerveModuleState[] moduleStates = Drive.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
 
     swerveSubsystem.setModuleStates(moduleStates);
+
+    //Operator
+    shotSpeed = SmartDashboard.getNumber("Shot Speed", 0);
+    double intakeAxis = operatorJoystick.getRawAxis(Control.LEFT_Y_AXIS);
+    double shooterAxis = operatorJoystick.getRawAxis(Control.LEFT_TRIGGER);
+    double feedAxis = operatorJoystick.getRawAxis(Control.RIGHT_TRIGGER);
+
+    if(intakeAxis<-0.5){
+      intakeSubsystem.setIntakeSpeed(Constants.Intake.SPIT_SPEED);
+    }
+    else if(intakeAxis>0.5){
+      intakeSubsystem.setIntakeSpeed(Constants.Intake.INTAKE_SPEED);
+    }
+    else if(feedAxis>0.5){
+      intakeSubsystem.setIntakeSpeed(Intake.FEED_SPEED);
+    }
+    else{
+      intakeSubsystem.setIntakeSpeed(0);
+    }
+
+
+
+    if(shooterAxis>0.5){
+      shooterSubsystem.setshotspeed(shotSpeed);
+    }
+    else{
+      shooterSubsystem.setshotspeed(0);
+    }
+
 
     //dashboard
     SmartDashboard.putNumber("Target Heading", targetRotation);
     SmartDashboard.putNumber("Heading", currentRotation);
+
     // SmartDashboard.putNumber("difference", angle);
     // SmartDashboard.putNumber("turnSpeed", turnSpeed);
   }

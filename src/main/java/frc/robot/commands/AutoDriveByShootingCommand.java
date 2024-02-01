@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SensorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.Drive;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.Constants;
 
@@ -50,7 +50,7 @@ public class AutoDriveByShootingCommand extends Command {
     double xSpeed = 0;
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, 0);
 
-    SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+    SwerveModuleState[] moduleStates = Drive.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
     swerveSubsystem.setModuleStates(moduleStates);
     boolean isStill = (xSpeed==0 || ySpeed ==0);
     if(isStill && shooterSubsystem.isReady()){
@@ -63,7 +63,10 @@ public class AutoDriveByShootingCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    shooterSubsystem.setshotspeed(0);
+    intakeSubsystem.setIntakeSpeed(0);
+  }
 
   // Returns true when the command should end.
   @Override
