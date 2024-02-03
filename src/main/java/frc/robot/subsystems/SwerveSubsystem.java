@@ -72,12 +72,15 @@ public class SwerveSubsystem extends SubsystemBase
     }
 
     public void zeroHeading() {
-        // sensorsubsystem.resetheading();
+        sensorsubsystem.resetheading();
     }
 
     public double getHeading(){
-        return 0;
-        // return Math.IEEEremainder(sensorsubsystem.getheading(), 360);
+        // return 0;
+        if(sensorsubsystem==null){
+            return 0;
+        }
+        return Math.IEEEremainder(sensorsubsystem.getheading(), 360);
     }
 
     public Rotation2d getRotation2d(){

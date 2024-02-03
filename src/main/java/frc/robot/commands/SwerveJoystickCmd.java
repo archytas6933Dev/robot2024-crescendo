@@ -123,6 +123,7 @@ public class SwerveJoystickCmd extends Command
     ySpeed = yLimiter.calculate(ySpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
     turnSpeed = turningLimiter.calculate(turnSpeed) * Drive.kTeleDriveMaxAngularSpeedRadiansPerSecond;
 
+
     ChassisSpeeds chassisSpeeds;
     if (isFieldCentric)
     {
@@ -132,48 +133,51 @@ public class SwerveJoystickCmd extends Command
     {
       chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, turnSpeed);
     }
-    if((sensorSubsystem.obstacle1 < 36) && (chassisSpeeds.vyMetersPerSecond>0))
-    {
-      chassisSpeeds.vyMetersPerSecond /= 16/(sensorSubsystem.obstacle1-20);
-    }
+    // if((sensorSubsystem.obstacle1 < 36) && (chassisSpeeds.vyMetersPerSecond>0))
+    // {
+    //   chassisSpeeds.vyMetersPerSecond /= 16/(sensorSubsystem.obstacle1-20);
+    // }
         SmartDashboard.putNumber("Y Speed2", chassisSpeeds.vyMetersPerSecond);
+        SmartDashboard.putNumber("X Speed2", chassisSpeeds.vxMetersPerSecond);
+
 
     SwerveModuleState[] moduleStates = Drive.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
 
     swerveSubsystem.setModuleStates(moduleStates);
+    SmartDashboard.putNumber("rotation", moduleStates[0].angle.getRadians());
 
     //Operator
     shotSpeed = SmartDashboard.getNumber("Shot Speed", 0);
     double intakeAxis = operatorJoystick.getRawAxis(Control.LEFT_Y_AXIS);
     double shooterAxis = operatorJoystick.getRawAxis(Control.LEFT_TRIGGER);
     double feedAxis = operatorJoystick.getRawAxis(Control.RIGHT_TRIGGER);
-
-    if(intakeAxis<-0.5){
-      intakeSubsystem.setIntakeSpeed(Constants.Intake.SPIT_SPEED);
-    }
-    else if(intakeAxis>0.5){
-      intakeSubsystem.setIntakeSpeed(Constants.Intake.INTAKE_SPEED);
-    }
-    else if(feedAxis>0.5){
-      intakeSubsystem.setIntakeSpeed(Intake.FEED_SPEED);
-    }
-    else{
-      intakeSubsystem.setIntakeSpeed(0);
-    }
-
-
-
-    if(shooterAxis>0.5){
-      shooterSubsystem.setshotspeed(shotSpeed);
-    }
-    else{
-      shooterSubsystem.setshotspeed(0);
+    if(intakeSubsystem!=null){
+      if(intakeAxis<-0.5){
+        intakeSubsystem.setIntakeSpeed(Constants.Intake.SPIT_SPEED);
+      }
+      else if(intakeAxis>0.5){
+        intakeSubsystem.setIntakeSpeed(Constants.Intake.INTAKE_SPEED);
+      }
+      else if(feedAxis>0.5){
+        intakeSubsystem.setIntakeSpeed(Intake.FEED_SPEED);
+      }
+      else{
+        intakeSubsystem.setIntakeSpeed(0);
+      }
     }
 
+    if(shooterSubsystem!=null){
+      if(shooterAxis>0.5){
+        shooterSubsystem.setshotspeed(shotSpeed);
+      }
+      else{
+        shooterSubsystem.setshotspeed(0);
+      }
+    }
 
     //dashboard
     SmartDashboard.putNumber("Target Heading", targetRotation);
-    SmartDashboard.putNumber("Heading", currentRotation);
+    // SmartDashboard.putNumber("Heading", currentRotation);
 
     // SmartDashboard.putNumber("difference", angle);
     // SmartDashboard.putNumber("turnSpeed", turnSpeed);

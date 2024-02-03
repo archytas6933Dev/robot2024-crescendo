@@ -74,13 +74,13 @@ public class SensorSubsystem extends SubsystemBase {
     if (currentY != 0) targetY = currentY;
     if (currentRot != 0) targetRot = currentRot;
 
-    double value = ultrasonic1.getAverageVoltage();
-    obstacle1 = value*12/.3;
-    SmartDashboard.putNumber("Obstacle", obstacle1);
-    double value2 = ultrasonic2.getAverageVoltage();
-    obstacle2 = value2*12/.3;
-    SmartDashboard.putNumber("Obstacle 2", obstacle2);
+    // double value = ultrasonic1.getAverageVoltage();
+    // obstacle1 = value*12/.3;
+    // SmartDashboard.putNumber("Obstacle", obstacle1);
+    // double value2 = ultrasonic2.getAverageVoltage();
+    // obstacle2 = value2*12/.3;
+    // SmartDashboard.putNumber("Obstacle 2", obstacle2);
     
-
+    SmartDashboard.putNumber("Heading", gyro_.getAngle());
   }
 }
