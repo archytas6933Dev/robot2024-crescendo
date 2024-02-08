@@ -16,6 +16,7 @@ public class IntakeSubsystem extends SubsystemBase{
   WPI_TalonFX motor_ = new WPI_TalonFX(Constants.Intake.MOTOR_ID);
   static DigitalInput intakeSwitch1 = new DigitalInput(Constants.Intake.SWITCH1_ID);
   static DigitalInput intakeSwitch2 = new DigitalInput(Constants.Intake.SWITCH2_ID);
+  private double requestedSpeed;
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     motor_.config_kF(0, Constants.Intake.MOTOR_POSITION_F);            
@@ -28,6 +29,10 @@ public class IntakeSubsystem extends SubsystemBase{
   }
 
   public void setIntakeSpeed(double speed){
+    if(speed == requestedSpeed){
+      return;
+    }
+
     if(speed == 0){
       motor_.setSelectedSensorPosition(0);
       motor_.set(ControlMode.Position, 0);
@@ -35,6 +40,7 @@ public class IntakeSubsystem extends SubsystemBase{
     else{
       motor_.set(ControlMode.PercentOutput, speed);
     }
+    requestedSpeed = speed;
   }
 
   @Override
