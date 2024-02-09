@@ -105,19 +105,19 @@ public class SwerveJoystickCmd extends Command
     int pov = driverJoystick.getPOV();
 
     if(pov == Control.DAXISN){
-      isFieldCentric = false;
-      xSpeed = sensorSubsystem.targetX / 60;
-      ySpeed = sensorSubsystem.targetY / 60;
-      xSpeed = Math.abs(xSpeed) > Control.kDeadband ? xSpeed : 0.0;
-      ySpeed = Math.abs(ySpeed) > Control.kDeadband ? ySpeed : 0.0;
-      turnSpeed = sensorSubsystem.targetRot / 900;
-      if ((sensorSubsystem.currentX == 0) && (sensorSubsystem.currentY == 0)) {
-        xSpeed = turnSpeed > 0 ? -0.3 : 0.3; // if invisible, slide left/right logically
-      }
+      // isFieldCentric = false;
+      // xSpeed = sensorSubsystem.targetX / 60;
+      // ySpeed = sensorSubsystem.targetY / 60;
+      // xSpeed = Math.abs(xSpeed) > Control.kDeadband ? xSpeed : 0.0;
+      // ySpeed = Math.abs(ySpeed) > Control.kDeadband ? ySpeed : 0.0;
+      // turnSpeed = sensorSubsystem.targetRot / 900;
+      // if ((sensorSubsystem.currentX == 0) && (sensorSubsystem.currentY == 0)) {
+      //   xSpeed = turnSpeed > 0 ? -0.3 : 0.3; // if invisible, slide left/right logically
+      // }
     }
     else if (pov == Control.DAXISS) {
-      turnSpeed = sensorSubsystem.targetX/80;    
-      turnSpeed = Math.abs(turnSpeed) > Control.kDeadband ? turnSpeed : 0.0;
+      // turnSpeed = sensorSubsystem.targetX/80;    
+      // turnSpeed = Math.abs(turnSpeed) > Control.kDeadband ? turnSpeed : 0.0;
     }
     xSpeed = xLimiter.calculate(xSpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
     ySpeed = yLimiter.calculate(ySpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
