@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -28,6 +29,7 @@ public class SwerveJoystickCmd extends Command
   private final SensorSubsystem sensorSubsystem;
   private final ShooterSubsystem shooterSubsystem;
   private final IntakeSubsystem intakeSubsystem;
+
 
   private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
   private final Joystick driverJoystick, operatorJoystick;
@@ -54,6 +56,7 @@ public class SwerveJoystickCmd extends Command
     this.yLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAccelerationUnitsPerSecond);
     this.turningLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAngularAccelerationUnitsPerSecond);
     addRequirements(swerveSubsystem);
+
   }
 
   // Called when the command is initially scheduled.
@@ -77,7 +80,7 @@ public class SwerveJoystickCmd extends Command
     double targetRotation = Math.toDegrees(Math.atan2(-xTurn,yTurn)) % 360;
     double turnSpeed = 0;
     
-    double currentRotation = swerveSubsystem.getRotation2d().getDegrees() % 360;
+    double currentRotation = swerveSubsystem.getPos().getRotation().getDegrees() % 360;
     double angle = ((360 + (targetRotation - currentRotation)) % 360)-180;
 
     if(Math.abs(xTurn) + Math.abs(yTurn) > 0.5) {
@@ -99,8 +102,7 @@ public class SwerveJoystickCmd extends Command
       turnSpeed /= 4;
     }
     //target tag
-    SmartDashboard.putNumber("X Speed", xSpeed);
-    SmartDashboard.putNumber("Y Speed", ySpeed);
+
 
     int pov = driverJoystick.getPOV();
 
@@ -127,7 +129,7 @@ public class SwerveJoystickCmd extends Command
     ChassisSpeeds chassisSpeeds;
     if (isFieldCentric)
     {
-      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed, turnSpeed, swerveSubsystem.getRotation2d());
+      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed, turnSpeed, swerveSubsystem.getPos().getRotation());
     }
     else
     {
@@ -137,14 +139,13 @@ public class SwerveJoystickCmd extends Command
     // {
     //   chassisSpeeds.vyMetersPerSecond /= 16/(sensorSubsystem.obstacle1-20);
     // }
-        SmartDashboard.putNumber("Y Speed2", chassisSpeeds.vyMetersPerSecond);
-        SmartDashboard.putNumber("X Speed2", chassisSpeeds.vxMetersPerSecond);
+
 
 
     SwerveModuleState[] moduleStates = Drive.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
 
     swerveSubsystem.setModuleStates(moduleStates);
-    SmartDashboard.putNumber("rotation", moduleStates[0].angle.getRadians());
+    // SmartDashboard.putNumber("rotation", moduleStates[0].angle.getRadians());
 
     //Operator
     shotSpeed = SmartDashboard.getNumber("Shot Speed", 0);
@@ -176,7 +177,7 @@ public class SwerveJoystickCmd extends Command
     }
 
     //dashboard
-    SmartDashboard.putNumber("Target Heading", targetRotation);
+    // SmartDashboard.putNumber("Target Heading", targetRotation);
     // SmartDashboard.putNumber("Heading", currentRotation);
 
     // SmartDashboard.putNumber("difference", angle);

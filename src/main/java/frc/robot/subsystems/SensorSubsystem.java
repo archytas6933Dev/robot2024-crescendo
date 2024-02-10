@@ -9,6 +9,10 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,6 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -34,6 +41,9 @@ public class SensorSubsystem extends SubsystemBase {
   public double currentRobotY;
   public double currentRobotRot;
 
+  private boolean canSee;
+
+
   /** Creates a new SensorSubsystem. */
   public SensorSubsystem() 
   {
@@ -51,6 +61,13 @@ public class SensorSubsystem extends SubsystemBase {
     return gyro_.getAngle();
   }
 
+  public boolean canSeeTags(){
+    return canSee;
+  }
+  public Pose2d getPosition(){
+    return new Pose2d(currentRobotX,currentRobotY, Rotation2d.fromDegrees(currentRobotRot));
+  }
+
   @Override
   public void periodic() 
   {
@@ -65,25 +82,41 @@ public class SensorSubsystem extends SubsystemBase {
     noteTargetY = noteY.getDouble(0);
 
 
-    NetworkTableEntry shotX = shooterTable.getEntry("tx");
-    NetworkTableEntry shotY = shooterTable.getEntry("ty");
-    shotTargetX = shotX.getDouble(0);
-    shotTargetY = shotY.getDouble(0);
+
 
     NetworkTableEntry position = shooterTable.getEntry("botpose");
-    double[] stuff = position.getDoubleArray(new double[1]);
+    double[] botpose = position.getDoubleArray(new double[1]);
     String str = "[";
-    for(int i=0;i<stuff.length;i++){
-      String a = Double.toString(stuff[i]);
+    for(int i=0;i<botpose.length;i++){
+      String a = Double.toString(botpose[i]);
       str+=a.substring(0,Math.min(a.length(),4))+",";
     }
     str=str.substring(0,str.length()-1)+"]";
 
     NetworkTableEntry jsonStuff = shooterTable.getEntry("json");
     ObjectMapper mapper = new ObjectMapper();
+    int numMarkers = 0;
     try {
-      JsonNode node = mapper.readTree(jsonStuff.getString(""));
+      JsonNode root = mapper.readTree(jsonStuff.getString(""));
+      // JsonNode results = root.path("Results");
+      JsonNode tags = root.path("Results").path("Fiducial");
+
+      for(int i=0;i<tags.size();i++){
+        int tagNum = tags.get(i).path("fID").asInt();
+        //speaker
+        if(tagNum==4 || tagNum == 7){
+          shotTargetX = tags.get(i).path("tx").asDouble();
+          shotTargetY = tags.get(i).path("ty").asDouble();
+        }
+        //amp
+        if(tagNum == 5 || tagNum == 6){
+
+        }
+      }
+
+
       
+      numMarkers = tags.size();
     } catch (JsonMappingException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -92,7 +125,13 @@ public class SensorSubsystem extends SubsystemBase {
       e.printStackTrace();
     }
 
-
+    canSee = false;
+    if(numMarkers >= 2){
+      canSee = true;
+      currentRobotX = -botpose[0];
+      currentRobotY = botpose[1];
+      currentRobotRot = -botpose[5];
+    }
 
     // currentX = tx.getDouble(0.0);
     // currentY = ty.getDouble(0.0);
@@ -110,14 +149,17 @@ public class SensorSubsystem extends SubsystemBase {
     // double value2 = ultrasonic2.getAverageVoltage();
     // obstacle2 = value2*12/.3;
     // SmartDashboard.putNumber("Obstacle 2", obstacle2);
-    
-    SmartDashboard.putNumber("Heading", gyro_.getAngle());
-    SmartDashboard.putNumber("note X", noteTargetX);
-    SmartDashboard.putNumber("note Y", noteTargetY);
+
+    // SmartDashboard.putNumber("Heading", gyro_.getAngle());
+    // SmartDashboard.putNumber("note X", noteTargetX);
+    // SmartDashboard.putNumber("note Y", noteTargetY);
     SmartDashboard.putNumber("shot X", shotTargetX);
     SmartDashboard.putNumber("shot Y", shotTargetY);
-    SmartDashboard.putString("stuff", str);
-    SmartDashboard.putString("json", jsonStuff.getString(""));
+    SmartDashboard.putNumber("robot X", currentRobotX);
+    SmartDashboard.putNumber("robot Y", currentRobotY);
+    SmartDashboard.putNumber("robot rotation", currentRobotRot);
+    SmartDashboard.putNumber("number of markers", numMarkers);
+
 
 
   }

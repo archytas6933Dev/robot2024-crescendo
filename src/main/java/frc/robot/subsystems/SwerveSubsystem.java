@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -7,6 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 // import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
 // import edu.wpi.first.wpilibj.geometry.Pose2d;
 // import edu.wpi.first.wpilibj.geometry.Rotation2d;
 // import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
@@ -19,6 +21,7 @@ import frc.robot.Constants.Drive;
 public class SwerveSubsystem extends SubsystemBase
 {
     private final SensorSubsystem sensorsubsystem;
+    // private SwerveDrivePoseEstimator positionEstimator;
 
     private final SwerveModule frontLeft = new SwerveModule(
             Drive.kFrontLeftDriveMotorPort,
@@ -56,9 +59,10 @@ public class SwerveSubsystem extends SubsystemBase
             Drive.kBackRightDriveAbsoluteEncoderOffsetRad,
             Drive.kBackRightDriveAbsoluteEncoderReversed);
     
-    private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(Drive.kDriveKinematics, 
-            getRotation2d(),  new SwerveModulePosition[]{frontLeft.getPosition(),frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()});
+    // private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(Drive.kDriveKinematics, 
+            // getRotation2d(),  new SwerveModulePosition[]{frontLeft.getPosition(),frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()});
 
+    private SwerveDrivePoseEstimator poseEstimator;
     public SwerveSubsystem(SensorSubsystem sensorsubsystem)
     {
         this.sensorsubsystem = sensorsubsystem;
@@ -66,6 +70,9 @@ public class SwerveSubsystem extends SubsystemBase
             try {
                 Thread.sleep(1000);
                 zeroHeading();
+                poseEstimator = new SwerveDrivePoseEstimator(Drive.kDriveKinematics, 
+            getRotation2d(),  new SwerveModulePosition[]{frontLeft.getPosition(),frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()},new Pose2d());
+
             } catch (Exception e){
             }
         }).start();
@@ -88,16 +95,30 @@ public class SwerveSubsystem extends SubsystemBase
     }
 
     public Pose2d getPos() {
-        return odometer.getPoseMeters();
+        // return odometer.getPoseMeters();
+        return poseEstimator.getEstimatedPosition();
+
     }
 
     public void resetOdometry(Pose2d pose){
-        odometer.resetPosition(getRotation2d(), new SwerveModulePosition[]{frontLeft.getPosition(),frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()},pose);
+        // odometer.resetPosition(getRotation2d(), new SwerveModulePosition[]{frontLeft.getPosition(),frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()},pose);
+        poseEstimator.resetPosition(getRotation2d(), new SwerveModulePosition[]{frontLeft.getPosition(),frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()},pose);
+
     }
 
     @Override
     public void periodic() 
     {
+        if(poseEstimator !=null){
+            poseEstimator.update(getRotation2d(), new SwerveModulePosition[]{frontLeft.getPosition(),frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()});
+            if(sensorsubsystem.canSeeTags()){
+                poseEstimator.addVisionMeasurement(sensorsubsystem.getPosition(),Timer.getFPGATimestamp());
+            }
+            Pose2d position = poseEstimator.getEstimatedPosition();
+            SmartDashboard.putNumber("X", position.getX());
+            SmartDashboard.putNumber("Y", position.getY());
+            SmartDashboard.putNumber("rot", position.getRotation().getDegrees());
+        }
     }
 
     public void stopModules(){
