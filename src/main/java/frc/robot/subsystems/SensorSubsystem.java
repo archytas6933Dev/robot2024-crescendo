@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,6 +43,7 @@ public class SensorSubsystem extends SubsystemBase {
   public double currentRobotRot;
 
   private boolean canSee;
+  private boolean atLeastOneTarget= false;
 
 
   /** Creates a new SensorSubsystem. */
@@ -63,6 +65,17 @@ public class SensorSubsystem extends SubsystemBase {
 
   public boolean canSeeTags(){
     return canSee;
+  }
+
+  public boolean isTargetClose(){
+    // return false;
+    return shotTargetY>Constants.Shooter.AUTO_SHOT_Y && atLeastOneTarget;
+
+  }
+
+  public boolean isNoteClose(){
+    // return false;
+    return noteTargetY<Constants.Intake.AUTO_NOTE_Y;
   }
   public Pose2d getPosition(){
     return new Pose2d(currentRobotX,currentRobotY, Rotation2d.fromDegrees(currentRobotRot));
@@ -107,6 +120,7 @@ public class SensorSubsystem extends SubsystemBase {
         if(tagNum==4 || tagNum == 7){
           shotTargetX = tags.get(i).path("tx").asDouble();
           shotTargetY = tags.get(i).path("ty").asDouble();
+
         }
         //amp
         if(tagNum == 5 || tagNum == 6){
@@ -132,6 +146,17 @@ public class SensorSubsystem extends SubsystemBase {
       currentRobotY = botpose[1];
       currentRobotRot = -botpose[5];
     }
+    else if(numMarkers==0){
+      shotTargetX = 0;
+      shotTargetY = 0;
+    }
+
+    if(numMarkers>=1){
+      atLeastOneTarget = true;
+    }
+    else{
+      atLeastOneTarget = false;
+    }
 
     // currentX = tx.getDouble(0.0);
     // currentY = ty.getDouble(0.0);
@@ -151,13 +176,13 @@ public class SensorSubsystem extends SubsystemBase {
     // SmartDashboard.putNumber("Obstacle 2", obstacle2);
 
     // SmartDashboard.putNumber("Heading", gyro_.getAngle());
-    // SmartDashboard.putNumber("note X", noteTargetX);
-    // SmartDashboard.putNumber("note Y", noteTargetY);
+    SmartDashboard.putNumber("note X", noteTargetX);
+    SmartDashboard.putNumber("note Y", noteTargetY);
     SmartDashboard.putNumber("shot X", shotTargetX);
     SmartDashboard.putNumber("shot Y", shotTargetY);
-    SmartDashboard.putNumber("robot X", currentRobotX);
-    SmartDashboard.putNumber("robot Y", currentRobotY);
-    SmartDashboard.putNumber("robot rotation", currentRobotRot);
+    // SmartDashboard.putNumber("robot X", currentRobotX);
+    // SmartDashboard.putNumber("robot Y", currentRobotY);
+    // SmartDashboard.putNumber("robot rotation", currentRobotRot);
     SmartDashboard.putNumber("number of markers", numMarkers);
 
 

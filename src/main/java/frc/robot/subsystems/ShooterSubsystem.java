@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //differnt messagge
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,8 +20,12 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 public class ShooterSubsystem extends SubsystemBase {
 
-  WPI_TalonFX motor_ = new WPI_TalonFX(1);
-  WPI_TalonFX follower_ = new WPI_TalonFX(2);
+  WPI_TalonFX left_ = new WPI_TalonFX(41);
+  WPI_TalonFX right_ = new WPI_TalonFX(42);
+  // private PIDController pidController = new PIDController(1/7000, 0, 0);
+  //  private final SimpleMotorFeedforward m_shooterFeedforward =
+  //     new SimpleMotorFeedforward(
+  //         Constants.Shooter.kSVolts, Constants.Shooter.kVVoltSecondsPerRotation);
   double requestedSpeed = 0;
 
   // CANSparkMax motor_ = new CanSparkMax(1);
@@ -29,32 +35,65 @@ public class ShooterSubsystem extends SubsystemBase {
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() 
   {
+
     //shooter.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-    motor_.setSelectedSensorPosition(0);
+    left_.setSelectedSensorPosition(0);
     //shooter.setSensorPhase(true);
-    motor_.config_kF(0, Constants.Shooter.MOTOR_VELOCITY_F);            
-    motor_.config_kP(0, Constants.Shooter.MOTOR_VELOCITY_P);
-    motor_.config_kI(0, Constants.Shooter.MOTOR_VELOCITY_I);
-    motor_.config_kD(0, Constants.Shooter.MOTOR_VELOCITY_D);
-    follower_.follow(motor_);
-    motor_.setNeutralMode(NeutralMode.Coast);
-    follower_.setNeutralMode(NeutralMode.Coast);
+    left_.config_kF(0, Constants.Shooter.MOTOR_VELOCITY_F);            
+    left_.config_kP(0, Constants.Shooter.MOTOR_VELOCITY_P);
+    left_.config_kI(0, Constants.Shooter.MOTOR_VELOCITY_I);
+    left_.config_kD(0, Constants.Shooter.MOTOR_VELOCITY_D);
+
+    right_.config_kF(0, Constants.Shooter.MOTOR_VELOCITY_F);            
+    right_.config_kP(0, Constants.Shooter.MOTOR_VELOCITY_P);
+    right_.config_kI(0, Constants.Shooter.MOTOR_VELOCITY_I);
+    right_.config_kD(0, Constants.Shooter.MOTOR_VELOCITY_D);
+
+    left_.setNeutralMode(NeutralMode.Coast);
+    right_.setNeutralMode(NeutralMode.Coast);
+    left_.configSelectedFeedbackCoefficient(1);
+    right_.configSelectedFeedbackCoefficient(1);
+
+
   }
 
 
   public void setshotspeed(double speed)
   {
-    requestedSpeed = speed;
-     motor_.set(ControlMode.Velocity, speed);
+    requestedSpeed = -speed;
+    // left_.set(ControlMode.PercentOutput, -speed/200);
+    // right_.set(ControlMode.PercentOutput, speed/100);
+
+    // left_.getSelectedSensorVelocity();
+    if(speed == 0){
+      left_.set(ControlMode.PercentOutput, 0);
+      right_.set(ControlMode.PercentOutput, 0);
+
+    }
+    else{
+
+
+      // double output = pidController.calculate(left_.getSelectedSensorVelocity(),speed);
+      // left_.set(ControlMode.PercentOutput, output);
+      // SmartDashboard.putNumber("calculated",output);
+    // }
+
+    left_.set(ControlMode.Velocity, requestedSpeed);
+    right_.set(ControlMode.Velocity, -requestedSpeed*0.7);
+    }
+
   }
   public boolean isReady(){
     
-    return(motor_.getSelectedSensorVelocity()>=requestedSpeed);
+    return(Math.abs(left_.getSelectedSensorVelocity()-requestedSpeed)<=100);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Shooter Speed", motor_.getSelectedSensorVelocity());
+    SmartDashboard.putBoolean("Can SHoot", isReady());
+    SmartDashboard.putNumber("Shooter Speed left", left_.getSelectedSensorVelocity());
+    SmartDashboard.putNumber("Shooter Speed right", right_.getSelectedSensorVelocity());
+
   }
 }

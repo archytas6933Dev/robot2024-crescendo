@@ -14,8 +14,8 @@ import frc.robot.Constants;
 
 public class IntakeSubsystem extends SubsystemBase{ 
   WPI_TalonFX motor_ = new WPI_TalonFX(Constants.Intake.MOTOR_ID);
-  static DigitalInput intakeSwitch1 = new DigitalInput(Constants.Intake.SWITCH1_ID);
-  static DigitalInput intakeSwitch2 = new DigitalInput(Constants.Intake.SWITCH2_ID);
+  static DigitalInput intakeSwitch = new DigitalInput(Constants.Intake.SWITCH1_ID);
+  static DigitalInput feedSwitch = new DigitalInput(Constants.Intake.SWITCH2_ID);
   private double requestedSpeed;
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
@@ -23,9 +23,20 @@ public class IntakeSubsystem extends SubsystemBase{
     motor_.config_kP(0, Constants.Intake.MOTOR_POSITION_P);
     motor_.config_kI(0, Constants.Intake.MOTOR_POSITION_I);
     motor_.config_kD(0, Constants.Intake.MOTOR_POSITION_D);
+
+    motor_.config_kF(1, Constants.Intake.MOTOR_VELOCITY_F);            
+    motor_.config_kP(1, Constants.Intake.MOTOR_VELOCITY_P);
+    motor_.config_kI(1, Constants.Intake.MOTOR_VELOCITY_I);
+    motor_.config_kD(1, Constants.Intake.MOTOR_VELOCITY_D);
   }
   public boolean hasNote(){
-    return (intakeSwitch1.get() || intakeSwitch2.get());
+    return isGrabbed() || isShotReady();
+  }
+  public boolean isShotReady(){
+    return feedSwitch.get();
+  }
+    public boolean isGrabbed(){
+    return intakeSwitch.get();
   }
 
   public void setIntakeSpeed(double speed){
@@ -35,10 +46,12 @@ public class IntakeSubsystem extends SubsystemBase{
 
     if(speed == 0){
       motor_.setSelectedSensorPosition(0);
+      motor_.selectProfileSlot(0, 0);
       motor_.set(ControlMode.Position, 0);
     }
     else{
-      motor_.set(ControlMode.PercentOutput, speed);
+      motor_.selectProfileSlot(1, 0);
+      motor_.set(ControlMode.Velocity, speed);
     }
     requestedSpeed = speed;
   }
@@ -46,7 +59,9 @@ public class IntakeSubsystem extends SubsystemBase{
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putBoolean("Intake", hasNote());
+    SmartDashboard.putBoolean("Intake", isGrabbed());
+    SmartDashboard.putBoolean("ShotReady", isShotReady());
+
   }
 }
 
