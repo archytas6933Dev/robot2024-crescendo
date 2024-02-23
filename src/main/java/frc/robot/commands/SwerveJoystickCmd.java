@@ -67,6 +67,7 @@ public class SwerveJoystickCmd extends Command
   public void initialize() {
     SmartDashboard.putNumber("Shot Speed", 7000);
 
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -86,7 +87,7 @@ public class SwerveJoystickCmd extends Command
     if(autoMode && sensorSubsystem.isNoteClose() && !intakeSubsystem.hasNote() && !isShooting){
       isAutoIntake = true;
     }
-    if(autoMode && sensorSubsystem.canSeeTags() && sensorSubsystem.isTargetClose() && intakeSubsystem.isShotReady()){
+    if(autoMode && sensorSubsystem.isTargetClose() && intakeSubsystem.isShotReady()){
       isAutoShoot = true;
     }
     if(shotTimer>0){
@@ -130,23 +131,28 @@ public class SwerveJoystickCmd extends Command
       }
 
 
-    double targetRotation = Math.toDegrees(Math.atan2(-xTurn,yTurn)) % 360;
+    // sensorSubsystem.setTargetRotation(Math.toDegrees(Math.atan2(-xTurn,yTurn)) % 360);
     double turnSpeed = 0;
-    
-    double currentRotation = swerveSubsystem.getPos().getRotation().getDegrees() % 360;
-    double angle = ((360 + (targetRotation - currentRotation)) % 360)-180;
 
     if(Math.abs(xTurn) + Math.abs(yTurn) > 0.5) {
-      turnSpeed = angle/180.0;
-    }
-    if(!isFieldCentric){
-      turnSpeed = xTurn;
+      sensorSubsystem.setTargetRotation(Math.toDegrees(Math.atan2(xTurn,-yTurn)) % 360);
     }
 
+    
+    double currentRotation = swerveSubsystem.getPos().getRotation().getDegrees() % 360;
+    double angle = ((180 + (sensorSubsystem.getTargetRotation() - currentRotation)) % 360)-180;
+
+    if(Math.abs(angle)>2.5){
+      turnSpeed = angle/180;
+    }
+    if(!isFieldCentric){
+      sensorSubsystem.setTargetRotation(currentRotation);
+      turnSpeed = xTurn;
+      turnSpeed = Math.abs(turnSpeed) > Control.kDeadband ? turnSpeed : 0.0;
+    }
 
     xSpeed = Math.abs(xSpeed) > Control.kDeadband ? xSpeed : 0.0;
     ySpeed = Math.abs(ySpeed) > Control.kDeadband ? ySpeed : 0.0;
-    turnSpeed = Math.abs(turnSpeed) > Control.kDeadband ? turnSpeed : 0.0;
    
     //precision mode
     if(driverJoystick.getRawButton(Control.RBBUTTON)){
@@ -174,19 +180,24 @@ public class SwerveJoystickCmd extends Command
     }
     if(isAutoShoot){
       isFieldCentric = false;
-      xSpeed = -sensorSubsystem.shotTargetX / 20;
-      ySpeed = sensorSubsystem.shotTargetY / 20;
-      xSpeed = Math.abs(xSpeed) > Control.kDeadband ? xSpeed : 0.0;
-      ySpeed = Math.abs(ySpeed) > Control.kDeadband ? ySpeed : 0.0;
+      xSpeed = -sensorSubsystem.shotTargetX / 30;
+      ySpeed = sensorSubsystem.shotTargetY / 30;
+      // xSpeed = Math.abs(xSpeed) > Control.kDeadband ? xSpeed : 0.0;
+      // ySpeed = Math.abs(ySpeed) > Control.kDeadband ? ySpeed : 0.0;
       shotSpeed=Constants.Shooter.SHOT_MEDIUM;
 
-      if((xSpeed == 0 && ySpeed==0 && shooterSubsystem.isReady()) || shotTimer>0){
+      if(( Math.abs(sensorSubsystem.shotTargetX) <= Constants.Shooter.XDeadband 
+          && Math.abs(sensorSubsystem.shotTargetY) <= Constants.Shooter.YDeadband 
+          && shooterSubsystem.isReady()) || shotTimer>0)
+      {
         intakeSpeed = Intake.FEED_SPEED;
+        xSpeed=0;
+        ySpeed=0;
         isShooting = true;
         if(shotTimer == -1){
-          shotTimer = System.currentTimeMillis();
+          shotTimer = sensorSubsystem.getTime();
         }
-        else if(System.currentTimeMillis()-shotTimer>Constants.Shooter.SHOTTOTALTIME){
+        else if(sensorSubsystem.getTime()-shotTimer>Constants.Shooter.SHOTTOTALTIME){
           shotTimer = -1;
           isShooting = false;
           shotSpeed = 0;
@@ -252,6 +263,8 @@ public class SwerveJoystickCmd extends Command
     SmartDashboard.putBoolean("auto mode", autoMode);
     SmartDashboard.putBoolean("auto intake", isAutoIntake);
     SmartDashboard.putBoolean("auto shoot", isAutoShoot);
+
+    SmartDashboard.putNumber("angle", angle);
 
 
     // SmartDashboard.putNumber("Target Heading", targetRotation);

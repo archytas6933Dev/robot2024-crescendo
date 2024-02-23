@@ -37,8 +37,9 @@ public class AutoIntakeCommand extends Command {
   @Override
   public void execute() {
     //Set speeds based on note position on screen
-    double ySpeed = 0;
-    double xSpeed = 0;
+    double xSpeed = sensorSubsystem.noteTargetX / 60;
+    double ySpeed = 0.5;
+
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, 0);
 
     SwerveModuleState[] moduleStates = Drive.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
@@ -49,12 +50,12 @@ public class AutoIntakeCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-        intakeSubsystem.setIntakeSpeed(0);
+    intakeSubsystem.setIntakeSpeed(0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-   return intakeSubsystem.hasNote();
+   return intakeSubsystem.isShotReady();
   }
 }

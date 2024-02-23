@@ -17,6 +17,11 @@ public class IntakeSubsystem extends SubsystemBase{
   static DigitalInput intakeSwitch = new DigitalInput(Constants.Intake.SWITCH1_ID);
   static DigitalInput feedSwitch = new DigitalInput(Constants.Intake.SWITCH2_ID);
   private double requestedSpeed;
+
+  private long curTime = 0;
+  private long lastSawIntake = 0;
+  private long lastShotReady = 0;
+
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     motor_.config_kF(0, Constants.Intake.MOTOR_POSITION_F);            
@@ -33,10 +38,24 @@ public class IntakeSubsystem extends SubsystemBase{
     return isGrabbed() || isShotReady();
   }
   public boolean isShotReady(){
-    return feedSwitch.get();
+
+    if(feedSwitch.get()){
+      lastShotReady  = curTime;
+    }
+    if(lastShotReady +Constants.Intake.SHOT_STALE<curTime){
+      return false;
+    }
+    return true;
+    // return feedSwitch.get();
   }
-    public boolean isGrabbed(){
-    return intakeSwitch.get();
+  public boolean isGrabbed(){
+    if(intakeSwitch.get()){
+      lastSawIntake  =curTime;
+    }
+    if(lastSawIntake+Constants.Intake.GRABBED_STALE<curTime){
+      return false;
+    }
+    return true;
   }
 
   public void setIntakeSpeed(double speed){
@@ -58,6 +77,7 @@ public class IntakeSubsystem extends SubsystemBase{
 
   @Override
   public void periodic() {
+    curTime = System.currentTimeMillis();
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Intake", isGrabbed());
     SmartDashboard.putBoolean("ShotReady", isShotReady());

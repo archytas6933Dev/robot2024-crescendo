@@ -21,6 +21,7 @@ import frc.robot.Constants.Drive;
 public class SwerveSubsystem extends SubsystemBase
 {
     private final SensorSubsystem sensorsubsystem;
+    private boolean hasSetHeading = false;
     // private SwerveDrivePoseEstimator positionEstimator;
 
     private final SwerveModule frontLeft = new SwerveModule(
@@ -72,7 +73,7 @@ public class SwerveSubsystem extends SubsystemBase
                 zeroHeading();
                 poseEstimator = new SwerveDrivePoseEstimator(Drive.kDriveKinematics, 
             getRotation2d(),  new SwerveModulePosition[]{frontLeft.getPosition(),frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()},new Pose2d());
-
+                sensorsubsystem.setTargetRotation(getHeading());
             } catch (Exception e){
             }
         }).start();
@@ -113,11 +114,15 @@ public class SwerveSubsystem extends SubsystemBase
             poseEstimator.update(getRotation2d(), new SwerveModulePosition[]{frontLeft.getPosition(),frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()});
             if(sensorsubsystem.canSeeTags()){
                 poseEstimator.addVisionMeasurement(sensorsubsystem.getPosition(),Timer.getFPGATimestamp());
+                if(!hasSetHeading){
+                    sensorsubsystem.setTargetRotation(sensorsubsystem.getPosition().getRotation().getDegrees());
+                    hasSetHeading = true;
+                }
             }
             Pose2d position = poseEstimator.getEstimatedPosition();
             SmartDashboard.putNumber("X", position.getX());
             SmartDashboard.putNumber("Y", position.getY());
-            SmartDashboard.putNumber("rot", position.getRotation().getDegrees());
+            SmartDashboard.putNumber("Heading", position.getRotation().getDegrees());
         }
     }
 

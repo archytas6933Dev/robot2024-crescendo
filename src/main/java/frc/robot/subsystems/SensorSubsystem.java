@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.Intake;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -43,13 +44,23 @@ public class SensorSubsystem extends SubsystemBase {
   public double currentRobotRot;
 
   private boolean canSee;
+  private boolean canSeeNote;
   private boolean atLeastOneTarget= false;
+  private double targetRotation = 0;
+  private long curTime = 0;
+
+  private long lastSawNote = 0;
+  private long lastSawTarget = 0;
+
+
+
 
 
   /** Creates a new SensorSubsystem. */
   public SensorSubsystem() 
   {
     gyro_ = new AHRS(SPI.Port.kMXP);
+
   }
 
 
@@ -61,6 +72,13 @@ public class SensorSubsystem extends SubsystemBase {
   public double getheading()
   {
     return gyro_.getAngle();
+  }
+
+  public void setTargetRotation(double rot){
+    targetRotation = rot;
+  }
+  public double getTargetRotation(){
+    return targetRotation;
   }
 
   public boolean canSeeTags(){
@@ -75,15 +93,19 @@ public class SensorSubsystem extends SubsystemBase {
 
   public boolean isNoteClose(){
     // return false;
-    return noteTargetY<Constants.Intake.AUTO_NOTE_Y;
+    return noteTargetY<Constants.Intake.AUTO_NOTE_Y && canSeeNote;
   }
   public Pose2d getPosition(){
     return new Pose2d(currentRobotX,currentRobotY, Rotation2d.fromDegrees(currentRobotRot));
   }
 
+  public long getTime(){
+    return curTime;
+  }
   @Override
   public void periodic() 
   {
+    curTime = System.currentTimeMillis();
     // This method will be called once per scheduler run
     
     NetworkTable shooterTable = NetworkTableInstance.getDefault().getTable("limelight-shooter");
@@ -91,9 +113,20 @@ public class SensorSubsystem extends SubsystemBase {
 
     NetworkTableEntry noteX = intakeTable.getEntry("tx");
     NetworkTableEntry noteY = intakeTable.getEntry("ty");
-    noteTargetX = noteX.getDouble(0);
-    noteTargetY = noteY.getDouble(0);
-
+    double tempNoteTargetX = noteX.getDouble(0);
+    double tempNoteTargetY = noteY.getDouble(0);
+    if(tempNoteTargetX==0 && tempNoteTargetY==0){
+      if(lastSawNote<curTime-Constants.Intake.NOTE_STALE){
+        noteTargetX = 0;
+        noteTargetY=0;
+      }
+    }
+    else{
+      lastSawNote = curTime;
+      noteTargetX = tempNoteTargetX;
+      noteTargetY = tempNoteTargetY;
+    }
+    canSeeNote = noteTargetX!=0 || noteTargetY!=0;
 
 
 
@@ -120,7 +153,7 @@ public class SensorSubsystem extends SubsystemBase {
         if(tagNum==4 || tagNum == 7){
           shotTargetX = tags.get(i).path("tx").asDouble();
           shotTargetY = tags.get(i).path("ty").asDouble();
-
+          lastSawTarget = curTime;
         }
         //amp
         if(tagNum == 5 || tagNum == 6){
@@ -147,8 +180,11 @@ public class SensorSubsystem extends SubsystemBase {
       currentRobotRot = -botpose[5];
     }
     else if(numMarkers==0){
-      shotTargetX = 0;
-      shotTargetY = 0;
+      if(lastSawTarget<curTime-Constants.Shooter.TARGET_STALE){
+        shotTargetX = 0;
+        shotTargetY = 0;
+      }
+
     }
 
     if(numMarkers>=1){
@@ -184,6 +220,7 @@ public class SensorSubsystem extends SubsystemBase {
     // SmartDashboard.putNumber("robot Y", currentRobotY);
     // SmartDashboard.putNumber("robot rotation", currentRobotRot);
     SmartDashboard.putNumber("number of markers", numMarkers);
+    SmartDashboard.putNumber("target rotation", targetRotation);
 
 
 

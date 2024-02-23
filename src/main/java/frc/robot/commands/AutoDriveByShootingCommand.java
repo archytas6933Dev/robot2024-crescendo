@@ -46,19 +46,26 @@ public class AutoDriveByShootingCommand extends Command {
   public void execute() {
     // Set drive speed based on april tags for target
     shooterSubsystem.setshotspeed(shotSpeed);
-    double ySpeed = 0;
-    double xSpeed = 0;
+    double xSpeed = -sensorSubsystem.shotTargetX / 30;
+    double ySpeed = sensorSubsystem.shotTargetY / 30;
+
+    if(( Math.abs(sensorSubsystem.shotTargetX) <= Constants.Shooter.XDeadband 
+    && Math.abs(sensorSubsystem.shotTargetY) <= Constants.Shooter.YDeadband 
+    && shooterSubsystem.isReady()) || shotTime>0){
+      intakeSubsystem.setIntakeSpeed(Constants.Intake.FEED_SPEED);
+      xSpeed = 0;
+      ySpeed = 0;
+      if(shotTime==-1){
+        shotTime = sensorSubsystem.getTime();
+      }
+
+    }
+
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, 0);
 
     SwerveModuleState[] moduleStates = Drive.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
     swerveSubsystem.setModuleStates(moduleStates);
-    boolean isStill = (xSpeed==0 || ySpeed ==0);
-    if(isStill && shooterSubsystem.isReady()){
-      intakeSubsystem.setIntakeSpeed(Constants.Intake.FEED_SPEED);
-      if(shotTime==-1){
-        shotTime = System.currentTimeMillis();
-      }
-    }
+
   }
 
   // Called once the command ends or is interrupted.
@@ -71,6 +78,6 @@ public class AutoDriveByShootingCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return(shotTime != -1 && System.currentTimeMillis() > shotTime + Constants.Shooter.SHOTTOTALTIME);
+    return(shotTime != -1 && sensorSubsystem.getTime() > shotTime + Constants.Shooter.SHOTTOTALTIME);
   }
 }

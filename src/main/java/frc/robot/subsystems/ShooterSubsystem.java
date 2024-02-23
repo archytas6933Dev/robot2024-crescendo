@@ -65,7 +65,10 @@ public class ShooterSubsystem extends SubsystemBase {
     // right_.set(ControlMode.PercentOutput, speed/100);
 
     // left_.getSelectedSensorVelocity();
-    if(speed == 0){
+    if(Math.abs(speed) == 0){
+      left_.set(ControlMode.Velocity, 0);
+      right_.set(ControlMode.Velocity, 0);
+
       left_.set(ControlMode.PercentOutput, 0);
       right_.set(ControlMode.PercentOutput, 0);
 
@@ -85,13 +88,14 @@ public class ShooterSubsystem extends SubsystemBase {
   }
   public boolean isReady(){
     
-    return(Math.abs(left_.getSelectedSensorVelocity()-requestedSpeed)<=100);
+    return(Math.abs(left_.getSelectedSensorVelocity()-requestedSpeed)<=100) && Math.abs(requestedSpeed)!=0;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putBoolean("Can SHoot", isReady());
+    SmartDashboard.putNumber("requested speed", requestedSpeed);
+    SmartDashboard.putBoolean("Can Shoot", isReady());
     SmartDashboard.putNumber("Shooter Speed left", left_.getSelectedSensorVelocity());
     SmartDashboard.putNumber("Shooter Speed right", right_.getSelectedSensorVelocity());
 
