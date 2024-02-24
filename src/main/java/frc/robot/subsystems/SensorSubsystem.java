@@ -95,6 +95,9 @@ public class SensorSubsystem extends SubsystemBase {
     // return false;
     return noteTargetY<Constants.Intake.AUTO_NOTE_Y && canSeeNote;
   }
+  public boolean isNoteVisible(){
+    return canSeeNote;
+  }
   public Pose2d getPosition(){
     return new Pose2d(currentRobotX,currentRobotY, Rotation2d.fromDegrees(currentRobotRot));
   }

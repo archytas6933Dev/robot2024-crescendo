@@ -4,13 +4,20 @@
 
 package frc.robot;
 
+import javax.swing.GroupLayout.SequentialGroup;
+
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.Control;
+import frc.robot.Constants.Shooter;
+import frc.robot.commands.AutoDriveByShootingCommand;
+import frc.robot.commands.AutoDriveCommand;
+import frc.robot.commands.AutoIntakeCommand;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.SensorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -55,6 +62,22 @@ public class RobotContainer
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    SequentialCommandGroup auto = new SequentialCommandGroup(
+      new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem),
+      new AutoDriveCommand(swerveSubsystem,-90,0.5,0.2,0),
+
+      new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem),
+      new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem),
+      new AutoDriveCommand(swerveSubsystem, 45, 0.3, 2, 225),
+      new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem),
+      new AutoDriveCommand(swerveSubsystem, -90, 0.3, 0.5, -45),
+      new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem)
+      // new AutoDriveCommand(swerveSubsystem, -90, 0.3, 0.5, 45),
+
+      );
+    // auto.addCommands(new AutoDriveCommand(swerveSubsystem,0,0.2,1,0));
+
+
+    return auto;
   }
 }

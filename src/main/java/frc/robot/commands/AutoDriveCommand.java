@@ -19,6 +19,16 @@ public class AutoDriveCommand extends Command {
   private SwerveSubsystem swerveSubsystem;
   private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
 
+  /*
+   *  RED
+  *      90
+  *  180      0
+  *     270
+   *  DRIVER
+   * 
+   * 
+   */
+
 
   public AutoDriveCommand(SwerveSubsystem swerveSubsystem, double angle, double velocity, double distance, double facing) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -50,13 +60,13 @@ public class AutoDriveCommand extends Command {
       turnSpeed = angle/180;
     }
 
-    xSpeed = xLimiter.calculate(xSpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
-    ySpeed = yLimiter.calculate(ySpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
-    turnSpeed = turningLimiter.calculate(turnSpeed) * Drive.kTeleDriveMaxAngularSpeedRadiansPerSecond;
+    double tempXSpeed = xLimiter.calculate(xSpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
+    double tempYSpeed = yLimiter.calculate(ySpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
+    double tempTurnSpeed = turningLimiter.calculate(turnSpeed) * Drive.kTeleDriveMaxAngularSpeedRadiansPerSecond;
 
 
     ChassisSpeeds chassisSpeeds;
-    chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed, turnSpeed, swerveSubsystem.getPos().getRotation());
+    chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(tempYSpeed, tempXSpeed, tempTurnSpeed, swerveSubsystem.getPos().getRotation());
 
 
     SwerveModuleState[] moduleStates = Drive.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
@@ -68,7 +78,15 @@ public class AutoDriveCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    ChassisSpeeds chassisSpeeds;
+    chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, swerveSubsystem.getPos().getRotation());
+
+
+    SwerveModuleState[] moduleStates = Drive.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+
+    swerveSubsystem.setModuleStates(moduleStates);
+  }
 
   // Returns true when the command should end.
   @Override

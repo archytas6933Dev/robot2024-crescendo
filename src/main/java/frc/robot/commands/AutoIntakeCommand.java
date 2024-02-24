@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,6 +20,8 @@ public class AutoIntakeCommand extends Command {
   private final SwerveSubsystem swerveSubsystem;
   private final SensorSubsystem sensorSubsystem;
   private final IntakeSubsystem intakeSubsystem;
+
+  private SlewRateLimiter xLimiter,yLimiter;
   public AutoIntakeCommand(    
     SwerveSubsystem swerveSubsystem, 
     SensorSubsystem sensorSubsystem,
@@ -26,12 +29,18 @@ public class AutoIntakeCommand extends Command {
       this.sensorSubsystem = sensorSubsystem;
       this.swerveSubsystem = swerveSubsystem;
       this.intakeSubsystem = intakeSubsystem;
+      this.xLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAccelerationUnitsPerSecond);
+      this.yLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAccelerationUnitsPerSecond);
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(sensorSubsystem);
+    addRequirements(swerveSubsystem);
+    addRequirements(intakeSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -39,6 +48,9 @@ public class AutoIntakeCommand extends Command {
     //Set speeds based on note position on screen
     double xSpeed = sensorSubsystem.noteTargetX / 60;
     double ySpeed = 0.5;
+
+    xSpeed = xLimiter.calculate(xSpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
+    ySpeed = yLimiter.calculate(ySpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
 
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, 0);
 
@@ -56,6 +68,6 @@ public class AutoIntakeCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-   return intakeSubsystem.isShotReady();
+   return intakeSubsystem.isShotReady() || (!sensorSubsystem.isNoteVisible() && !intakeSubsystem.hasNote());
   }
 }

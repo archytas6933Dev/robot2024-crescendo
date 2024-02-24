@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,6 +22,8 @@ public class AutoDriveByShootingCommand extends Command {
   private final IntakeSubsystem intakeSubsystem;
   private final ShooterSubsystem shooterSubsystem;
   private final double shotSpeed;
+private SlewRateLimiter xLimiter,yLimiter;
+
   private long shotTime = -1;
   public AutoDriveByShootingCommand( 
   double shotSpeed,   
@@ -33,7 +36,13 @@ public class AutoDriveByShootingCommand extends Command {
     this.swerveSubsystem = swerveSubsystem;
     this.intakeSubsystem = intakeSubsystem;
     this.shooterSubsystem = shooterSubsystem;
+    this.xLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAccelerationUnitsPerSecond);
+    this.yLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAccelerationUnitsPerSecond);
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(sensorSubsystem);
+    addRequirements(swerveSubsystem);
+    addRequirements(intakeSubsystem);
+    addRequirements(shooterSubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -60,6 +69,9 @@ public class AutoDriveByShootingCommand extends Command {
       }
 
     }
+
+    xSpeed = xLimiter.calculate(xSpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
+    ySpeed = yLimiter.calculate(ySpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
 
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, 0);
 

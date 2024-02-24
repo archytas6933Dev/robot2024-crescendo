@@ -81,6 +81,9 @@ public class SwerveJoystickCmd extends Command
     if(operatorJoystick.getRawButton(Control.BBUTTON)){
       autoMode = false;
     }
+    if(driverJoystick.getRawButton(Control.BBUTTON)){
+      autoMode = false;
+    }
 
     boolean isAutoShoot = false;
     boolean isAutoIntake = false;
