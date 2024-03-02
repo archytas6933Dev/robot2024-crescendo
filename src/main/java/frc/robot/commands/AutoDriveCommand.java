@@ -53,8 +53,8 @@ public class AutoDriveCommand extends Command {
   @Override
   public void execute() {
     double turnSpeed = 0;
-    double currentRotation = swerveSubsystem.getPos().getRotation().getDegrees() % 360;
-    double angle = ((180 + (facing - currentRotation)) % 360)-180;
+    double currentRotation = swerveSubsystem.getPos().getRotation().getDegrees() % 360 - 180;
+    double angle = (((facing + 360 - currentRotation)) % 360)-180;
 
     if(Math.abs(angle)>2.5){
       turnSpeed = angle/180;

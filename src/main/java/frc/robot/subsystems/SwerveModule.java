@@ -11,6 +11,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -71,6 +72,8 @@ public class SwerveModule {
         
         turningPidController = new PIDController(Swerve.kPTurning, 0, 0);
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
+
+        driveMotor.setSmartCurrentLimit(40);
 
         resetEncoder();
     }

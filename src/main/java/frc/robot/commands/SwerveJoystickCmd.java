@@ -38,6 +38,7 @@ public class SwerveJoystickCmd extends Command
   private boolean isShooting = false;
   private boolean autoMode = false;
   private long shotTimer = -1;
+  private long intakeTimer = -1;
   
   public SwerveJoystickCmd(
     Joystick driverJoystick, 
@@ -78,30 +79,34 @@ public class SwerveJoystickCmd extends Command
     if(operatorJoystick.getRawButton(Control.ABUTTON)){
       autoMode = true;
     }
+    // if(driverJoystick.getRawButton(Control.ABUTTON)){
+    //   autoMode = true;
+    // }
     if(operatorJoystick.getRawButton(Control.BBUTTON)){
       autoMode = false;
     }
-    if(driverJoystick.getRawButton(Control.BBUTTON)){
-      autoMode = false;
-    }
+    // if(driverJoystick.getRawButton(Control.BBUTTON)){
+    //   autoMode = false;
+    // }
 
     boolean isAutoShoot = false;
     boolean isAutoIntake = false;
     if(autoMode && sensorSubsystem.isNoteClose() && !intakeSubsystem.hasNote() && !isShooting){
       isAutoIntake = true;
     }
-    if(autoMode && sensorSubsystem.isTargetClose() && intakeSubsystem.isShotReady()){
+    if(autoMode && sensorSubsystem.isTargetClose() && intakeSubsystem.isShotReady() && 
+          (driverJoystick.getRawAxis(Control.RIGHT_TRIGGER)>0.5)){
       isAutoShoot = true;
     }
     if(shotTimer>0){
       isAutoShoot = true;
     }
-
-    double xSpeed = driverJoystick.getRawAxis(Control.LEFT_X_AXIS);
-    double ySpeed = -driverJoystick.getRawAxis(Control.LEFT_Y_AXIS);
-    double xTurn = driverJoystick.getRawAxis(Control.RIGHT_X_AXIS);
-    double yTurn = driverJoystick.getRawAxis(Control.RIGHT_Y_AXIS);
-    boolean isFieldCentric = !driverJoystick.getRawButton(Control.LBBUTTON);
+    double inversion = sensorSubsystem.isRed?1:-1;
+    double xSpeed = driverJoystick.getRawAxis(Control.LEFT_X_AXIS) * inversion;
+    double ySpeed = -driverJoystick.getRawAxis(Control.LEFT_Y_AXIS) * inversion;
+    double xTurn = driverJoystick.getRawAxis(Control.RIGHT_X_AXIS) * inversion;
+    double yTurn = driverJoystick.getRawAxis(Control.RIGHT_Y_AXIS) * inversion;
+    boolean isFieldCentric = !driverJoystick.getRawButton(Control.XBUTTON);
 
     // shotSpeed = SmartDashboard.getNumber("Shot Speed", 0);
     
@@ -122,7 +127,10 @@ public class SwerveJoystickCmd extends Command
       // else if(feedAxis>0.5){
       //   intakeSubsystem.setIntakeSpeed(Intake.FEED_SPEED);
       // }
+
+      // SmartDashboard.getNumber("Shot Speed", shotSpeed);
       if(shooterAxis>0.5){
+        // shotSpeed = SmartDashboard.getNumber("Shot Speed", shotSpeed);
         shotSpeed = Constants.Shooter.SHOT_MEDIUM;
         if((shooterSubsystem.isReady() && intakeSubsystem.isShotReady()) || isShooting){
           intakeSpeed = Intake.FEED_SPEED;
@@ -137,18 +145,34 @@ public class SwerveJoystickCmd extends Command
     // sensorSubsystem.setTargetRotation(Math.toDegrees(Math.atan2(-xTurn,yTurn)) % 360);
     double turnSpeed = 0;
 
-    if(Math.abs(xTurn) + Math.abs(yTurn) > 0.5) {
+    if(Math.abs(xTurn) + Math.abs(yTurn) > 0.5 && !isAutoIntake && !isAutoShoot && isFieldCentric) {
+      if(intakeSubsystem.hasNote()){
+        xTurn = -xTurn;
+        yTurn = -yTurn;
+      }
       sensorSubsystem.setTargetRotation(Math.toDegrees(Math.atan2(xTurn,-yTurn)) % 360);
+    
     }
 
     
-    double currentRotation = swerveSubsystem.getPos().getRotation().getDegrees() % 360;
-    double angle = ((180 + (sensorSubsystem.getTargetRotation() - currentRotation)) % 360)-180;
+    double currentRotation = swerveSubsystem.getPos().getRotation().getDegrees() % 360 - 180;
+    double angle = (((sensorSubsystem.getTargetRotation() + 360 - currentRotation)) % 360)-180;
 
     if(Math.abs(angle)>2.5){
       turnSpeed = angle/180;
     }
-    if(!isFieldCentric){
+    
+    if(driverJoystick.getRawButton(Control.RBBUTTON)){
+      turnSpeed = 0.5;
+    }
+
+    if(driverJoystick.getRawButton(Control.LBBUTTON)){
+      turnSpeed = -0.5;
+    }
+
+
+    if(!isFieldCentric && !isAutoIntake && !isAutoShoot){
+
       sensorSubsystem.setTargetRotation(currentRotation);
       turnSpeed = xTurn;
       turnSpeed = Math.abs(turnSpeed) > Control.kDeadband ? turnSpeed : 0.0;
@@ -158,7 +182,7 @@ public class SwerveJoystickCmd extends Command
     ySpeed = Math.abs(ySpeed) > Control.kDeadband ? ySpeed : 0.0;
    
     //precision mode
-    if(driverJoystick.getRawButton(Control.RBBUTTON)){
+    if(driverJoystick.getRawButton(Control.YBUTTON)){
       xSpeed /= 4;
       ySpeed /= 4;
       turnSpeed /= 4;
@@ -171,9 +195,10 @@ public class SwerveJoystickCmd extends Command
     if(isAutoIntake){
       isFieldCentric = false;
       xSpeed = sensorSubsystem.noteTargetX / 60;
-      ySpeed = 0.5;
+      ySpeed = 0.8;
       xSpeed = Math.abs(xSpeed) > Control.kDeadband ? xSpeed : 0.0;
       intakeSpeed = intakeSubsystem.isShotReady()?0:Intake.INTAKE_SPEED;
+      intakeTimer = sensorSubsystem.getTime();
 
       // ySpeed = Math.abs(ySpeed) > Control.kDeadband ? ySpeed : 0.0;
       // turnSpeed = sensorSubsystem.targetRot / 900;
@@ -181,10 +206,14 @@ public class SwerveJoystickCmd extends Command
       //   xSpeed = turnSpeed > 0 ? -0.3 : 0.3; // if invisible, slide left/right logically
       // }
     }
+    if( autoMode && sensorSubsystem.getTime()-intakeTimer<Constants.Intake.INTAKE_STALE && intakeTimer!=-1 && intakeSubsystem.isShotReady()){
+      sensorSubsystem.setTargetRotation(sensorSubsystem.isRed?0:180);
+      intakeTimer = -1;
+    }
     if(isAutoShoot){
       isFieldCentric = false;
       xSpeed = -sensorSubsystem.shotTargetX / 30;
-      ySpeed = sensorSubsystem.shotTargetY / 30;
+      ySpeed = sensorSubsystem.shotTargetY / 40;
       // xSpeed = Math.abs(xSpeed) > Control.kDeadband ? xSpeed : 0.0;
       // ySpeed = Math.abs(ySpeed) > Control.kDeadband ? ySpeed : 0.0;
       shotSpeed=Constants.Shooter.SHOT_MEDIUM;
@@ -212,6 +241,9 @@ public class SwerveJoystickCmd extends Command
       // if ((sensorSubsystem.currentX == 0) && (sensorSubsystem.currentY == 0)) {
       //   xSpeed = turnSpeed > 0 ? -0.3 : 0.3; // if invisible, slide left/right logically
       // }
+    }
+    if(autoMode && sensorSubsystem.isTargetClose() && intakeSubsystem.hasNote()){
+      shotSpeed=Constants.Shooter.SHOT_MEDIUM;
     }
     // else if (pov == Control.DAXISS) {
     //   // turnSpeed = sensorSubsystem.targetX/80;    

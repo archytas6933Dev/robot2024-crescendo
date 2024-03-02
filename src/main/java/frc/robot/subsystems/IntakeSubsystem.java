@@ -38,7 +38,6 @@ public class IntakeSubsystem extends SubsystemBase{
     return isGrabbed() || isShotReady();
   }
   public boolean isShotReady(){
-
     if(feedSwitch.get()){
       lastShotReady  = curTime;
     }
@@ -70,7 +69,7 @@ public class IntakeSubsystem extends SubsystemBase{
     }
     else{
       motor_.selectProfileSlot(1, 0);
-      motor_.set(ControlMode.Velocity, speed);
+      motor_.set(ControlMode.Velocity, speed);S
     }
     requestedSpeed = speed;
   }
@@ -81,6 +80,7 @@ public class IntakeSubsystem extends SubsystemBase{
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Intake", isGrabbed());
     SmartDashboard.putBoolean("ShotReady", isShotReady());
+    System.out.println(isShotReady() + ", " + feedSwitch.get());
 
   }
 }

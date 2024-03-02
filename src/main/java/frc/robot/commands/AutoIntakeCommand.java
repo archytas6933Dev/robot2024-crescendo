@@ -68,6 +68,12 @@ public class AutoIntakeCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-   return intakeSubsystem.isShotReady() || (!sensorSubsystem.isNoteVisible() && !intakeSubsystem.hasNote());
+    boolean isDone = intakeSubsystem.isShotReady() || (!sensorSubsystem.isNoteVisible() && !intakeSubsystem.hasNote());
+    if(isDone){
+      System.out.println(intakeSubsystem.isShotReady() );
+      System.out.println(sensorSubsystem.isNoteVisible());
+      System.out.println(intakeSubsystem.hasNote());
+    }
+   return isDone;
   }
 }

@@ -54,7 +54,9 @@ private SlewRateLimiter xLimiter,yLimiter;
   //execute when target can be seen and driven straight towards
   public void execute() {
     // Set drive speed based on april tags for target
+    if(sensorSubsystem.isAtLeastOneTag()){
     shooterSubsystem.setshotspeed(shotSpeed);
+
     double xSpeed = -sensorSubsystem.shotTargetX / 30;
     double ySpeed = sensorSubsystem.shotTargetY / 30;
 
@@ -77,7 +79,7 @@ private SlewRateLimiter xLimiter,yLimiter;
 
     SwerveModuleState[] moduleStates = Drive.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
     swerveSubsystem.setModuleStates(moduleStates);
-
+    }
   }
 
   // Called once the command ends or is interrupted.

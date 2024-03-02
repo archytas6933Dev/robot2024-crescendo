@@ -51,6 +51,7 @@ public class SensorSubsystem extends SubsystemBase {
 
   private long lastSawNote = 0;
   private long lastSawTarget = 0;
+  public boolean isRed;
 
 
 
@@ -85,9 +86,12 @@ public class SensorSubsystem extends SubsystemBase {
     return canSee;
   }
 
+  public boolean isAtLeastOneTag(){
+    return atLeastOneTarget && shotTargetX != Double.NaN && shotTargetY != Double.NaN;
+  }
   public boolean isTargetClose(){
     // return false;
-    return shotTargetY>Constants.Shooter.AUTO_SHOT_Y && atLeastOneTarget;
+    return isAtLeastOneTag() && shotTargetY>Constants.Shooter.AUTO_SHOT_Y ;
 
   }
 
@@ -105,6 +109,7 @@ public class SensorSubsystem extends SubsystemBase {
   public long getTime(){
     return curTime;
   }
+
   @Override
   public void periodic() 
   {
@@ -113,6 +118,8 @@ public class SensorSubsystem extends SubsystemBase {
     
     NetworkTable shooterTable = NetworkTableInstance.getDefault().getTable("limelight-shooter");
     NetworkTable intakeTable = NetworkTableInstance.getDefault().getTable("limelight-intake");
+    NetworkTable FMSinfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
+    isRed = FMSinfo.getEntry("IsRedAlliance").getBoolean(true);
 
     NetworkTableEntry noteX = intakeTable.getEntry("tx");
     NetworkTableEntry noteY = intakeTable.getEntry("ty");
@@ -153,7 +160,7 @@ public class SensorSubsystem extends SubsystemBase {
       for(int i=0;i<tags.size();i++){
         int tagNum = tags.get(i).path("fID").asInt();
         //speaker
-        if(tagNum==4 || tagNum == 7){
+        if((tagNum==4 && isRed) || (tagNum == 7 && !isRed)){
           shotTargetX = tags.get(i).path("tx").asDouble();
           shotTargetY = tags.get(i).path("ty").asDouble();
           lastSawTarget = curTime;
@@ -184,8 +191,8 @@ public class SensorSubsystem extends SubsystemBase {
     }
     else if(numMarkers==0){
       if(lastSawTarget<curTime-Constants.Shooter.TARGET_STALE){
-        shotTargetX = 0;
-        shotTargetY = 0;
+        shotTargetX = Double.NaN;
+        shotTargetY = Double.NaN;
       }
 
     }
@@ -219,6 +226,9 @@ public class SensorSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("note Y", noteTargetY);
     SmartDashboard.putNumber("shot X", shotTargetX);
     SmartDashboard.putNumber("shot Y", shotTargetY);
+    SmartDashboard.putBoolean("alliance", isRed);
+        SmartDashboard.putBoolean("isNoteVisible", isNoteVisible());
+
     // SmartDashboard.putNumber("robot X", currentRobotX);
     // SmartDashboard.putNumber("robot Y", currentRobotY);
     // SmartDashboard.putNumber("robot rotation", currentRobotRot);

@@ -133,7 +133,7 @@ public class Constants {
        public static final double SHOT_MEDIUM = 14000;
        public static final double AUTO_SHOT_Y = -8;
 
-        public static final double XDeadband = 20;
+        public static final double XDeadband = 3;
         public static final double YDeadband = 3;
 
         public static final long TARGET_STALE = 100;
@@ -158,12 +158,13 @@ public class Constants {
 
         public static final double AUTO_NOTE_Y = 40;
 
-        public static final long NOTE_STALE = 100;
-        public static final long GRABBED_STALE = 500;
-        public static final long SHOT_STALE = 500;
+        public static final long NOTE_STALE = 500;
+        public static final long GRABBED_STALE = 100;
+        public static final long SHOT_STALE = 100;
+        public static final long INTAKE_STALE = 1000;
 
 
-        public static final double INTAKE_SPEED = -7000;
+        public static final double INTAKE_SPEED = -4500;
         public static final double FEED_SPEED = -7000;
         public static final double SPIT_SPEED = 7000;
         public static final int SWITCH1_ID = 1;

@@ -70,6 +70,7 @@ public class SwerveSubsystem extends SubsystemBase
         new Thread(() -> {
             try {
                 Thread.sleep(1000);
+                System.out.println("Zeroing Heading");
                 zeroHeading();
                 poseEstimator = new SwerveDrivePoseEstimator(Drive.kDriveKinematics, 
             getRotation2d(),  new SwerveModulePosition[]{frontLeft.getPosition(),frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()},new Pose2d());
@@ -123,6 +124,7 @@ public class SwerveSubsystem extends SubsystemBase
             SmartDashboard.putNumber("X", position.getX());
             SmartDashboard.putNumber("Y", position.getY());
             SmartDashboard.putNumber("Heading", position.getRotation().getDegrees());
+            
         }
     }
 
