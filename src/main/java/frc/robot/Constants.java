@@ -121,26 +121,43 @@ public class Constants {
         public static final double kDeadband = 0.1;
     }
     public static final class Shooter {
-       public static final boolean EXISTS = true;
-       public static final double MOTOR_VELOCITY_F = 0.011; //0.011;
-       public static final double MOTOR_VELOCITY_P = 0.005; //0.25
-       public static final double MOTOR_VELOCITY_I = 0.0002;
-       public static final double MOTOR_VELOCITY_D = 1.0;
-       public static final int MOTOR_ID = 0;
-       public static final int FOLLOWER_ID = 0;
-       public static final long SHOTTOTALTIME = 1000; // in milliseconds
+        public static final boolean EXISTS = true;
+        public static final double MOTOR_VELOCITY_F = 0.011; //0.011;
+        public static final double MOTOR_VELOCITY_P = 0.005; //0.25
+        public static final double MOTOR_VELOCITY_I = 0.0002;
+        public static final double MOTOR_VELOCITY_D = 1.0;
+        public static final int MOTOR_ID = 0;
+        public static final int FOLLOWER_ID = 0;
+        public static final long SHOTTOTALTIME = 1000; // in milliseconds
 
-       public static final double SHOT_MEDIUM = 14000;
-       public static final double AUTO_SHOT_Y = -8;
+        public static final double TILT_POSITION_F = 0; //0.011;
+        public static final double TILT_POSITION_P = 0.03; //0.25
+        public static final double TILT_POSITION_I = 0;
+        public static final double TILT_POSITION_D = 0;
+
+        public static final double TILT_THRESHOLD = 0;
+
+        public static final double TILT_LOW = 0;
+        public static final double TILT_MEDIUM = 0;
+        public static final double TILT_HIGH = 0;
+
+        public static final double HIGH_OFFSET = 0;
+        public static final double MEDIUM_OFFSET = 0;
+        public static final double LOW_OFFSET = 0;
+
+
+        public static final double SHOT_MEDIUM = 14000;
+        public static final double AUTO_SHOT_Y = -8;
 
         public static final double XDeadband = 3;
         public static final double YDeadband = 3;
 
+
         public static final long TARGET_STALE = 100;
 
 
-       public static final double kSVolts = 0;
-       public static final double kVVoltSecondsPerRotation = 0;
+        public static final double kSVolts = 0;
+        public static final double kVVoltSecondsPerRotation = 0;
 
     }
     public static final class Intake {

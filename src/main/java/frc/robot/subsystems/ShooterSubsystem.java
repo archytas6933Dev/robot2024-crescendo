@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //differnt messagge
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.Shooter;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -22,11 +23,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
   WPI_TalonFX left_ = new WPI_TalonFX(41);
   WPI_TalonFX right_ = new WPI_TalonFX(42);
+  WPI_TalonFX tilt_ = new WPI_TalonFX(61);
   // private PIDController pidController = new PIDController(1/7000, 0, 0);
   //  private final SimpleMotorFeedforward m_shooterFeedforward =
   //     new SimpleMotorFeedforward(
   //         Constants.Shooter.kSVolts, Constants.Shooter.kVVoltSecondsPerRotation);
   double requestedSpeed = 0;
+  double targetPosition = Shooter.TILT_LOW;
 
   // CANSparkMax motor_ = new CanSparkMax(1);
   // WPI_TalonSRX motor_ = new WPI_TalonSRX(11);
@@ -54,9 +57,29 @@ public class ShooterSubsystem extends SubsystemBase {
     left_.configSelectedFeedbackCoefficient(1);
     right_.configSelectedFeedbackCoefficient(1);
 
-
+    tilt_.config_kF(0, Constants.Shooter.TILT_POSITION_F);            
+    tilt_.config_kP(0, Constants.Shooter.TILT_POSITION_P);
+    tilt_.config_kI(0, Constants.Shooter.TILT_POSITION_I);
+    tilt_.config_kD(0, Constants.Shooter.TILT_POSITION_D);
+    tilt_.setSelectedSensorPosition(0);
   }
 
+  public double getTiltPosition(){
+    return tilt_.getSelectedSensorPosition();
+  }
+
+  public double getTiltSpeed(){
+    return Math.abs(tilt_.getSelectedSensorVelocity());
+  }
+
+  public double getTargetTilt(){
+    return targetPosition;
+  }
+
+  public void setTiltPosition(double position){
+    targetPosition = position;
+    tilt_.set(ControlMode.Position, position);
+  }
 
   public void setshotspeed(double speed)
   {
@@ -88,16 +111,19 @@ public class ShooterSubsystem extends SubsystemBase {
   }
   public boolean isReady(){
     
-    return(Math.abs(left_.getSelectedSensorVelocity()-requestedSpeed)<=100) && Math.abs(requestedSpeed)!=0;
+    return(Math.abs(left_.getSelectedSensorVelocity()-requestedSpeed)<=100) && Math.abs(requestedSpeed)!=0  && getTiltSpeed()<Constants.Shooter.TILT_THRESHOLD;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("requested speed", requestedSpeed);
+    // SmartDashboard.putNumber("requested speed", requestedSpeed);
     SmartDashboard.putBoolean("Can Shoot", isReady());
-    SmartDashboard.putNumber("Shooter Speed left", left_.getSelectedSensorVelocity());
-    SmartDashboard.putNumber("Shooter Speed right", right_.getSelectedSensorVelocity());
+    // SmartDashboard.putNumber("Shooter Speed left", left_.getSelectedSensorVelocity());
+    // SmartDashboard.putNumber("Shooter Speed right", right_.getSelectedSensorVelocity());
+    SmartDashboard.putNumber("Tilt position", getTiltPosition());
+    SmartDashboard.putNumber("Tilt speed", getTiltSpeed());
+
 
   }
 }

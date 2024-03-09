@@ -48,11 +48,13 @@ public class AutoIntakeCommand extends Command {
     //Set speeds based on note position on screen
     double xSpeed = sensorSubsystem.noteTargetX / 60;
     double ySpeed = 0.5;
-
+    //if(intakeSubsystem.isGrabbed()) ySpeed = 0;
     xSpeed = xLimiter.calculate(xSpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
     ySpeed = yLimiter.calculate(ySpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
 
-    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, 0);
+    double turnSpeed = swerveSubsystem.turnForAngle(sensorSubsystem.getTargetRotation());
+
+    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, turnSpeed);
 
     SwerveModuleState[] moduleStates = Drive.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
     swerveSubsystem.setModuleStates(moduleStates);

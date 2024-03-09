@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Intake;
+import frc.robot.Constants.Shooter;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -52,7 +53,7 @@ public class SensorSubsystem extends SubsystemBase {
   private long lastSawNote = 0;
   private long lastSawTarget = 0;
   public boolean isRed;
-
+  private double targetYOffset = 0;
 
 
 
@@ -110,6 +111,21 @@ public class SensorSubsystem extends SubsystemBase {
     return curTime;
   }
 
+  public void setTargetYOffset(double position){
+    if(position == Shooter.TILT_HIGH){
+      targetYOffset = Shooter.HIGH_OFFSET;
+    }
+    else if(position == Shooter.TILT_MEDIUM){
+      targetYOffset = Shooter.MEDIUM_OFFSET;
+    }
+    else if(position == Shooter.TILT_LOW){
+      targetYOffset = Shooter.LOW_OFFSET;
+    }
+    else{
+      targetYOffset = 0;
+    }
+  }
+
   @Override
   public void periodic() 
   {
@@ -162,7 +178,7 @@ public class SensorSubsystem extends SubsystemBase {
         //speaker
         if((tagNum==4 && isRed) || (tagNum == 7 && !isRed)){
           shotTargetX = tags.get(i).path("tx").asDouble();
-          shotTargetY = tags.get(i).path("ty").asDouble();
+          shotTargetY = tags.get(i).path("ty").asDouble()+targetYOffset;
           lastSawTarget = curTime;
         }
         //amp

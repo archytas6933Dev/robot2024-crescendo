@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Drive;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.SensorSubsystem;
 
 public class AutoDriveCommand extends Command {
   /** Creates a new AutoDriveCommand. */
@@ -18,7 +19,7 @@ public class AutoDriveCommand extends Command {
   private Pose2d position;
   private SwerveSubsystem swerveSubsystem;
   private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
-
+  private SensorSubsystem sensorSubsystem;
   /*
    *  RED
   *      90
@@ -29,14 +30,28 @@ public class AutoDriveCommand extends Command {
    * 
    */
 
-
-  public AutoDriveCommand(SwerveSubsystem swerveSubsystem, double angle, double velocity, double distance, double facing) {
-    // Use addRequirements() here to declare subsystem dependencies.
+  public AutoDriveCommand(SwerveSubsystem swerveSubsystem, SensorSubsystem sensorSubsystem, double angle, double velocity, double distance, double facing) {
+    this(swerveSubsystem, sensorSubsystem, angle, velocity, distance, facing, 0, 0);
+  }
+  public AutoDriveCommand(SwerveSubsystem swerveSubsystem, SensorSubsystem sensorSubsystem, double angle, double velocity, double distance, double facing, double destX, double destY) {
+    // Use addRequirements() here to declare subsystem dependencies.S
     this.swerveSubsystem = swerveSubsystem;
+    this.sensorSubsystem = sensorSubsystem;
     this.distance = distance;
     this.facing = facing;
     this.xSpeed = Math.cos(Math.toRadians(angle))*velocity;
     this.ySpeed = Math.sin(Math.toRadians(angle))*velocity;
+    if(destX !=0 || destY !=0){
+      Pose2d pose = swerveSubsystem.getPos();
+      double currX = pose.getX();
+      double currY = pose.getY();
+      double diffX = destX-currX;
+      double diffY = destY-currY;
+      this.distance = Math.sqrt(diffX*diffX+diffY*diffY);
+      double divisor = (Math.abs(diffX)>Math.abs(diffY))? Math.abs(diffX/velocity): Math.abs(diffY/velocity);
+        this.xSpeed = diffX/divisor;
+        this.ySpeed = diffY/divisor; 
+    }
     this.xLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAccelerationUnitsPerSecond);
     this.yLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAccelerationUnitsPerSecond);
     this.turningLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAngularAccelerationUnitsPerSecond);
@@ -47,18 +62,15 @@ public class AutoDriveCommand extends Command {
   @Override
   public void initialize() {
     this.position = swerveSubsystem.getPos();
+    sensorSubsystem.setTargetRotation(facing);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double turnSpeed = 0;
-    double currentRotation = swerveSubsystem.getPos().getRotation().getDegrees() % 360 - 180;
-    double angle = (((facing + 360 - currentRotation)) % 360)-180;
 
-    if(Math.abs(angle)>2.5){
-      turnSpeed = angle/180;
-    }
+   double turnSpeed = swerveSubsystem.turnForAngle(facing);
+
 
     double tempXSpeed = xLimiter.calculate(xSpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
     double tempYSpeed = yLimiter.calculate(ySpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;

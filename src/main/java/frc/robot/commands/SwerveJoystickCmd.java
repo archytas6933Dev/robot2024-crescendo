@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Drive;
 import frc.robot.Constants.Intake;
+import frc.robot.Constants.Shooter;
 import frc.robot.Constants;
 import frc.robot.Constants.Control;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -66,7 +67,7 @@ public class SwerveJoystickCmd extends Command
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    SmartDashboard.putNumber("Shot Speed", 7000);
+    // SmartDashboard.putNumber("Shot Speed", 7000);
 
 
   }
@@ -79,15 +80,15 @@ public class SwerveJoystickCmd extends Command
     if(operatorJoystick.getRawButton(Control.ABUTTON)){
       autoMode = true;
     }
-    // if(driverJoystick.getRawButton(Control.ABUTTON)){
-    //   autoMode = true;
-    // }
+    if(driverJoystick.getRawButton(Control.ABUTTON)){
+      autoMode = true;
+    }
     if(operatorJoystick.getRawButton(Control.BBUTTON)){
       autoMode = false;
     }
-    // if(driverJoystick.getRawButton(Control.BBUTTON)){
-    //   autoMode = false;
-    // }
+    if(driverJoystick.getRawButton(Control.BBUTTON)){
+      autoMode = false;
+    }
 
     boolean isAutoShoot = false;
     boolean isAutoIntake = false;
@@ -106,13 +107,29 @@ public class SwerveJoystickCmd extends Command
     double ySpeed = -driverJoystick.getRawAxis(Control.LEFT_Y_AXIS) * inversion;
     double xTurn = driverJoystick.getRawAxis(Control.RIGHT_X_AXIS) * inversion;
     double yTurn = driverJoystick.getRawAxis(Control.RIGHT_Y_AXIS) * inversion;
-    boolean isFieldCentric = !driverJoystick.getRawButton(Control.XBUTTON);
+    boolean isTrigger = driverJoystick.getRawAxis(Control.LEFT_TRIGGER)>0.5;
+    boolean isFieldCentric = !isTrigger;
 
     // shotSpeed = SmartDashboard.getNumber("Shot Speed", 0);
     
     double intakeAxis = operatorJoystick.getRawAxis(Control.LEFT_Y_AXIS);
     double shooterAxis = operatorJoystick.getRawAxis(Control.LEFT_TRIGGER);
+    int tiltAxis = operatorJoystick.getPOV();
     // double feedAxis = operatorJoystick.getRawAxis(Control.RIGHT_TRIGGER);
+    if(tiltAxis==Constants.Control.DAXISN){
+      shooterSubsystem.setTiltPosition(Shooter.TILT_HIGH);
+      sensorSubsystem.setTargetYOffset(Shooter.TILT_HIGH);
+    }
+    if(tiltAxis==Constants.Control.DAXISE || tiltAxis == Control.DAXISW){
+      shooterSubsystem.setTiltPosition(Shooter.TILT_MEDIUM);
+      sensorSubsystem.setTargetYOffset(Shooter.TILT_MEDIUM);
+
+    }
+    if(tiltAxis==Constants.Control.DAXISW){
+      shooterSubsystem.setTiltPosition(Shooter.TILT_LOW);
+      sensorSubsystem.setTargetYOffset(Shooter.TILT_LOW);
+
+    } 
 
     double intakeSpeed = 0;
     double shotSpeed = 0;
@@ -155,13 +172,9 @@ public class SwerveJoystickCmd extends Command
     }
 
     
-    double currentRotation = swerveSubsystem.getPos().getRotation().getDegrees() % 360 - 180;
-    double angle = (((sensorSubsystem.getTargetRotation() + 360 - currentRotation)) % 360)-180;
+    turnSpeed = swerveSubsystem.turnForAngle(sensorSubsystem.getTargetRotation());
 
-    if(Math.abs(angle)>2.5){
-      turnSpeed = angle/180;
-    }
-    
+
     if(driverJoystick.getRawButton(Control.RBBUTTON)){
       turnSpeed = 0.5;
     }
@@ -172,7 +185,7 @@ public class SwerveJoystickCmd extends Command
 
 
     if(!isFieldCentric && !isAutoIntake && !isAutoShoot){
-
+      double currentRotation = swerveSubsystem.getPos().getRotation().getDegrees() % 360 - 180;
       sensorSubsystem.setTargetRotation(currentRotation);
       turnSpeed = xTurn;
       turnSpeed = Math.abs(turnSpeed) > Control.kDeadband ? turnSpeed : 0.0;
@@ -182,7 +195,7 @@ public class SwerveJoystickCmd extends Command
     ySpeed = Math.abs(ySpeed) > Control.kDeadband ? ySpeed : 0.0;
    
     //precision mode
-    if(driverJoystick.getRawButton(Control.YBUTTON)){
+    if(isTrigger){
       xSpeed /= 4;
       ySpeed /= 4;
       turnSpeed /= 4;
@@ -299,7 +312,7 @@ public class SwerveJoystickCmd extends Command
     SmartDashboard.putBoolean("auto intake", isAutoIntake);
     SmartDashboard.putBoolean("auto shoot", isAutoShoot);
 
-    SmartDashboard.putNumber("angle", angle);
+    //SmartDashboard.putNumber("angle", angle);
 
 
     // SmartDashboard.putNumber("Target Heading", targetRotation);

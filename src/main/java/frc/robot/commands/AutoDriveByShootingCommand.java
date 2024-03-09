@@ -21,17 +21,19 @@ public class AutoDriveByShootingCommand extends Command {
   private final SensorSubsystem sensorSubsystem;
   private final IntakeSubsystem intakeSubsystem;
   private final ShooterSubsystem shooterSubsystem;
-  private final double shotSpeed;
+  private final double shotSpeed, shotPosition;
 private SlewRateLimiter xLimiter,yLimiter;
 
   private long shotTime = -1;
   public AutoDriveByShootingCommand( 
-  double shotSpeed,   
+  double shotSpeed,  
+  double shotPosition, 
   SwerveSubsystem swerveSubsystem, 
   SensorSubsystem sensorSubsystem,
   IntakeSubsystem intakeSubsystem,
   ShooterSubsystem shooterSubsystem) {
     this.shotSpeed = shotSpeed;
+    this.shotPosition = shotPosition;
     this.sensorSubsystem = sensorSubsystem;
     this.swerveSubsystem = swerveSubsystem;
     this.intakeSubsystem = intakeSubsystem;
@@ -47,7 +49,12 @@ private SlewRateLimiter xLimiter,yLimiter;
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    
+    shooterSubsystem.setshotspeed(shotSpeed);
+    shooterSubsystem.setTiltPosition(shotPosition);
+    sensorSubsystem.setTargetYOffset(shotPosition);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -55,7 +62,7 @@ private SlewRateLimiter xLimiter,yLimiter;
   public void execute() {
     // Set drive speed based on april tags for target
     if(sensorSubsystem.isAtLeastOneTag()){
-    shooterSubsystem.setshotspeed(shotSpeed);
+
 
     double xSpeed = -sensorSubsystem.shotTargetX / 30;
     double ySpeed = sensorSubsystem.shotTargetY / 30;
@@ -71,11 +78,11 @@ private SlewRateLimiter xLimiter,yLimiter;
       }
 
     }
-
+    double turnSpeed = swerveSubsystem.turnForAngle(sensorSubsystem.getTargetRotation());
     xSpeed = xLimiter.calculate(xSpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
     ySpeed = yLimiter.calculate(ySpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
 
-    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, 0);
+    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, turnSpeed);
 
     SwerveModuleState[] moduleStates = Drive.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
     swerveSubsystem.setModuleStates(moduleStates);

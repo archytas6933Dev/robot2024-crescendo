@@ -111,6 +111,7 @@ public class SwerveSubsystem extends SubsystemBase
     @Override
     public void periodic() 
     {
+        updateDashboard();
         if(poseEstimator !=null){
             poseEstimator.update(getRotation2d(), new SwerveModulePosition[]{frontLeft.getPosition(),frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()});
             if(sensorsubsystem.canSeeTags()){
@@ -143,7 +144,16 @@ public class SwerveSubsystem extends SubsystemBase
         backRight.setDesiredState(desiredStates[3]);
     
     }
+    public double turnForAngle( double targetRotation)
+    {
+        double currentRotation = getPos().getRotation().getDegrees() % 360 - 180;
+        double angle = (((targetRotation + 360 - currentRotation)) % 360)-180;
 
+        if(Math.abs(angle)>2.5){
+            return angle/180;
+        }
+        return 0;
+    }
     public void updateDashboard()
     {
         // SmartDashboard.putNumber("Encoder 1", frontRight.getTurningPosition());
@@ -154,5 +164,21 @@ public class SwerveSubsystem extends SubsystemBase
         // SmartDashboard.putNumber("Rad 2", frontLeft.getAbsoluteEncoderRad());
         // SmartDashboard.putNumber("Rad 3", backLeft.getAbsoluteEncoderRad());
         // SmartDashboard.putNumber("Rad 4", backRight.getAbsoluteEncoderRad());
+    //     Pose2d pose = getPos();
+    //   double currX = pose.getX();
+    //   double currY = pose.getY();
+    //   double destX = -3;
+    //   double destY = 3;
+    //   double velocity = 0.5;
+    //   double diffX = destX-currX;
+    //   double diffY = destY-currY;
+    //   double distance = Math.sqrt(diffX*diffX+diffY*diffY);
+    //   double divisor = (Math.abs(diffX)>Math.abs(diffY))? Math.abs(diffX/velocity): Math.abs(diffY/velocity);
+    //     double xSpeed = diffX/divisor;
+    //     double ySpeed = diffY/divisor;
+    // SmartDashboard.putNumber("AutoX", xSpeed);
+    // SmartDashboard.putNumber("AutoY", ySpeed);
+    // SmartDashboard.putNumber("AutoDist", distance);
     }
+
 }
