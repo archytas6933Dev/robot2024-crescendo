@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -16,6 +17,7 @@ public class IntakeSubsystem extends SubsystemBase{
   WPI_TalonFX motor_ = new WPI_TalonFX(Constants.Intake.MOTOR_ID);
   static DigitalInput intakeSwitch = new DigitalInput(Constants.Intake.SWITCH1_ID);
   static DigitalInput feedSwitch = new DigitalInput(Constants.Intake.SWITCH2_ID);
+  static Encoder encoder = new Encoder(2,3);
   private double requestedSpeed;
 
   private long curTime = 0;
@@ -80,6 +82,7 @@ public class IntakeSubsystem extends SubsystemBase{
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Intake", isGrabbed());
     SmartDashboard.putBoolean("ShotReady", isShotReady());
+    SmartDashboard.putNumber("encoder", encoder.getRate());
     //System.out.println(isShotReady() + ", " + feedSwitch.get());
 
   }

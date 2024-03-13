@@ -85,7 +85,7 @@ public class RobotContainer
         new AutoDriveCommand(swerveSubsystem,sensorSubsystem,290,0.8, 2,355),
         new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout(2.0),
         new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 70,0.8, 3, 340),
-        new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.LOW_OFFSET, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem))
+        new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem))
         :
         new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0)
         );
@@ -103,9 +103,9 @@ public class RobotContainer
         new SequentialCommandGroup(
         new AutoDriveCommand(swerveSubsystem,sensorSubsystem,70,0.8, 3,10),
         new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout(2),
-        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 290,0.8, 3, 20),
+        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 270,0.8, 6, 20),
         // new AutoDriveCommand(swerveSubsystem, 250, 0.5, 2, 20),
-        new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.LOW_OFFSET, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem)):
+        new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem)):
         new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0)
         
         );
@@ -150,7 +150,7 @@ public class RobotContainer
         new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout(2.0),
         new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 110,0.8, 3, 200),
         // new AutoDriveCommand(swerveSubsystem, 250, 0.5, 2, 20),
-        new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.LOW_OFFSET, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem)):
+        new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem)):
         new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 180)
         );
       }
@@ -189,7 +189,7 @@ public class RobotContainer
         new AutoDriveCommand(swerveSubsystem,sensorSubsystem,110,0.8, 2,175),
         new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout(2.0),
         new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 250,0.8, 3, 160),
-        new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.LOW_OFFSET, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem)):
+        new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem)):
         new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 180)
         );
       }
