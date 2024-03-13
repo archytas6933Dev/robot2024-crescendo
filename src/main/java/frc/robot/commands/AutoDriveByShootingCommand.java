@@ -50,7 +50,8 @@ private SlewRateLimiter xLimiter,yLimiter;
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    
+    System.out.println("shoot");
+
     shooterSubsystem.setshotspeed(shotSpeed);
     shooterSubsystem.setTiltPosition(shotPosition);
     sensorSubsystem.setTargetYOffset(shotPosition);

@@ -83,7 +83,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public void setshotspeed(double speed)
   {
-    requestedSpeed = -speed;
+    requestedSpeed = speed;
     // left_.set(ControlMode.PercentOutput, -speed/200);
     // right_.set(ControlMode.PercentOutput, speed/100);
 
@@ -105,7 +105,7 @@ public class ShooterSubsystem extends SubsystemBase {
     // }
 
     left_.set(ControlMode.Velocity, requestedSpeed);
-    right_.set(ControlMode.Velocity, -requestedSpeed*0.7);
+    right_.set(ControlMode.Velocity, -requestedSpeed*.7);
     }
 
   }

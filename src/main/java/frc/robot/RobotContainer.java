@@ -101,8 +101,8 @@ public class RobotContainer
         new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem),
         isMidfield?
         new SequentialCommandGroup(
-        new AutoDriveCommand(swerveSubsystem,sensorSubsystem,70,0.8, 2,5),
-        new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout(2.0),
+        new AutoDriveCommand(swerveSubsystem,sensorSubsystem,70,0.8, 3,10),
+        new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout(2),
         new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 290,0.8, 3, 20),
         // new AutoDriveCommand(swerveSubsystem, 250, 0.5, 2, 20),
         new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.LOW_OFFSET, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem)):

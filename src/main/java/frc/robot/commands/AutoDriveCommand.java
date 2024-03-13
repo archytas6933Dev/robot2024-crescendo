@@ -61,6 +61,7 @@ public class AutoDriveCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    System.out.println("drive");
     this.position = swerveSubsystem.getPos();
     sensorSubsystem.setTargetRotation(facing);
   }

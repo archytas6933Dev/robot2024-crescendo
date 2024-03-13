@@ -19,8 +19,8 @@ public class IntakeSubsystem extends SubsystemBase{
   private double requestedSpeed;
 
   private long curTime = 0;
-  private long lastSawIntake = 0;
-  private long lastShotReady = 0;
+  public long lastSawIntake = 0;
+  public long lastShotReady = 0;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {

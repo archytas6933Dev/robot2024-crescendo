@@ -68,7 +68,7 @@ public class Constants {
 
         public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond;// / 4;
         public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond;// / 4;
-        public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 8; //3;
+        public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 5; //3;
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 8; //3;
     }
 
@@ -176,8 +176,8 @@ public class Constants {
         public static final double AUTO_NOTE_Y = 40;
 
         public static final long NOTE_STALE = 500;
-        public static final long GRABBED_STALE = 100;
-        public static final long SHOT_STALE = 100;
+        public static final long GRABBED_STALE = 500;
+        public static final long SHOT_STALE = 500;
         public static final long INTAKE_STALE = 1000;
 
 

@@ -40,6 +40,8 @@ public class AutoIntakeCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    System.out.println("intake");
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.

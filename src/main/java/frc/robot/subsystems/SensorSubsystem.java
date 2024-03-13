@@ -56,12 +56,16 @@ public class SensorSubsystem extends SubsystemBase {
   private double targetYOffset = 0;
 
 
-
+  private AnalogInput eye1;
+  private AnalogInput eye2;
 
   /** Creates a new SensorSubsystem. */
   public SensorSubsystem() 
   {
     gyro_ = new AHRS(SPI.Port.kMXP);
+    eye1 = new AnalogInput(0);
+      eye2 = new AnalogInput(1);
+
 
   }
 
@@ -129,6 +133,10 @@ public class SensorSubsystem extends SubsystemBase {
   @Override
   public void periodic() 
   {
+
+    SmartDashboard.putNumber("eye1", eye1.getVoltage());
+    SmartDashboard.putNumber("eye2", eye2.getVoltage());
+
     curTime = System.currentTimeMillis();
     // This method will be called once per scheduler run
     
