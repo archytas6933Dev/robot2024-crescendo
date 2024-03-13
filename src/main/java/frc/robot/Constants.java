@@ -135,15 +135,15 @@ public class Constants {
         public static final double TILT_POSITION_I = 0;
         public static final double TILT_POSITION_D = 0;
 
-        public static final double TILT_THRESHOLD = 0;
+        public static final double TILT_THRESHOLD = 100;
 
-        public static final double TILT_LOW = 0;
-        public static final double TILT_MEDIUM = 0;
-        public static final double TILT_HIGH = 0;
+        public static final double TILT_LOW = 300000;
+        public static final double TILT_MEDIUM = 250000;
+        public static final double TILT_HIGH = 200000;
 
-        public static final double HIGH_OFFSET = 0;
-        public static final double MEDIUM_OFFSET = 0;
-        public static final double LOW_OFFSET = 0;
+        public static final double HIGH_OFFSET = -10;
+        public static final double MEDIUM_OFFSET = -1.5;
+        public static final double LOW_OFFSET = 5.5;
 
 
         public static final double SHOT_MEDIUM = 14000;

@@ -125,11 +125,14 @@ public class SwerveJoystickCmd extends Command
       sensorSubsystem.setTargetYOffset(Shooter.TILT_MEDIUM);
 
     }
-    if(tiltAxis==Constants.Control.DAXISW){
+    if(tiltAxis==Constants.Control.DAXISS){
       shooterSubsystem.setTiltPosition(Shooter.TILT_LOW);
       sensorSubsystem.setTargetYOffset(Shooter.TILT_LOW);
 
     } 
+    if(operatorJoystick.getRawButton(Control.XBUTTON)){
+      shooterSubsystem.tiltUp();
+    }
 
     double intakeSpeed = 0;
     double shotSpeed = 0;

@@ -113,9 +113,15 @@ public class ShooterSubsystem extends SubsystemBase {
     
     return(Math.abs(left_.getSelectedSensorVelocity()-requestedSpeed)<=100) && Math.abs(requestedSpeed)!=0  && getTiltSpeed()<Constants.Shooter.TILT_THRESHOLD;
   }
+  public void tiltUp(){
+    tilt_.set(ControlMode.PercentOutput, -0.5);
+  }
 
   @Override
   public void periodic() {
+    if(tilt_.isRevLimitSwitchClosed() == 0){
+      tilt_.setSelectedSensorPosition(0);
+    }
     // This method will be called once per scheduler run
     // SmartDashboard.putNumber("requested speed", requestedSpeed);
     SmartDashboard.putBoolean("Can Shoot", isReady());
