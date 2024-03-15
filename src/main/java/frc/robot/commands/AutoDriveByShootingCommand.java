@@ -67,9 +67,15 @@ private SlewRateLimiter xLimiter,yLimiter;
 
     double xSpeed = -sensorSubsystem.shotTargetX / 30;
     double ySpeed = sensorSubsystem.shotTargetY / 30;
-
-    if(( Math.abs(sensorSubsystem.shotTargetX) <= Constants.Shooter.XDeadband 
-    && Math.abs(sensorSubsystem.shotTargetY) <= Constants.Shooter.YDeadband 
+    double YDeadband = Constants.Shooter.YDeadband;
+    double XDeadband = Constants.Shooter.XDeadband;
+    if(shotPosition == Constants.Shooter.TILT_HIGH){
+      XDeadband *=2;
+      YDeadband *=2;
+    }
+    
+    if(( Math.abs(sensorSubsystem.shotTargetX) <= XDeadband 
+    && Math.abs(sensorSubsystem.shotTargetY) <= YDeadband 
     && shooterSubsystem.isReady()) || shotTime>0){
       intakeSubsystem.setIntakeSpeed(Constants.Intake.FEED_SPEED);
       xSpeed = 0;

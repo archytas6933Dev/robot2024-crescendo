@@ -233,9 +233,15 @@ public class SwerveJoystickCmd extends Command
       // xSpeed = Math.abs(xSpeed) > Control.kDeadband ? xSpeed : 0.0;
       // ySpeed = Math.abs(ySpeed) > Control.kDeadband ? ySpeed : 0.0;
       shotSpeed=Constants.Shooter.SHOT_MEDIUM;
+      double YDeadband = Constants.Shooter.YDeadband;
+      double XDeadband = Constants.Shooter.XDeadband;
+      if(shooterSubsystem.getTargetTilt() == Constants.Shooter.TILT_HIGH){
+        XDeadband *=4;
+        YDeadband *=3;
+      }
 
-      if(( Math.abs(sensorSubsystem.shotTargetX) <= Constants.Shooter.XDeadband 
-          && Math.abs(sensorSubsystem.shotTargetY) <= Constants.Shooter.YDeadband 
+      if(( Math.abs(sensorSubsystem.shotTargetX) <= XDeadband 
+          && Math.abs(sensorSubsystem.shotTargetY) <= YDeadband 
           && shooterSubsystem.isReady()) || shotTimer>0)
       {
         intakeSpeed = Intake.FEED_SPEED;
