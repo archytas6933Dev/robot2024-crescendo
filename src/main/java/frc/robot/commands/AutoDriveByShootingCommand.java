@@ -70,8 +70,8 @@ private SlewRateLimiter xLimiter,yLimiter;
     double YDeadband = Constants.Shooter.YDeadband;
     double XDeadband = Constants.Shooter.XDeadband;
     if(shotPosition == Constants.Shooter.TILT_HIGH){
-      XDeadband *=2;
-      YDeadband *=2;
+      XDeadband *=4;
+      YDeadband *=3;
     }
     
     if(( Math.abs(sensorSubsystem.shotTargetX) <= XDeadband 

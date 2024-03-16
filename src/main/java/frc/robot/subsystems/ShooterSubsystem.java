@@ -111,7 +111,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
   public boolean isReady(){
     
-    return(Math.abs(left_.getSelectedSensorVelocity()-requestedSpeed)<=100) && Math.abs(requestedSpeed)!=0  && getTiltSpeed()<Constants.Shooter.TILT_THRESHOLD;
+    return(Math.abs(left_.getSelectedSensorVelocity()-requestedSpeed)<=Shooter.SHOT_TOLERANCE) && Math.abs(requestedSpeed)!=0  && getTiltSpeed()<Constants.Shooter.TILT_THRESHOLD;
   }
   public void tiltUp(){
     tilt_.set(ControlMode.PercentOutput, -0.5);

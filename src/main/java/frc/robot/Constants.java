@@ -122,13 +122,14 @@ public class Constants {
     }
     public static final class Shooter {
         public static final boolean EXISTS = true;
-        public static final double MOTOR_VELOCITY_F = 0.011; //0.011;
-        public static final double MOTOR_VELOCITY_P = 0.005; //0.25
-        public static final double MOTOR_VELOCITY_I = 0.0002;
-        public static final double MOTOR_VELOCITY_D = 1.0;
+        public static final double MOTOR_VELOCITY_F = 0.005; //0.011;
+        public static final double MOTOR_VELOCITY_P = 0.001; //0.25
+        public static final double MOTOR_VELOCITY_I = 0.00015;
+        public static final double MOTOR_VELOCITY_D = 2.0;
         public static final int MOTOR_ID = 0;
         public static final int FOLLOWER_ID = 0;
         public static final long SHOTTOTALTIME = 1000; // in milliseconds
+        public static final double SHOT_TOLERANCE = 500;
 
         public static final double TILT_POSITION_F = 0; //0.011;
         public static final double TILT_POSITION_P = 0.03; //0.25
@@ -142,15 +143,15 @@ public class Constants {
         public static final double TILT_HIGH = 200000;
 
         public static final double HIGH_OFFSET = -10;
-        public static final double MEDIUM_OFFSET = -1.5;
+        public static final double MEDIUM_OFFSET = -3.0; //-1.5
         public static final double LOW_OFFSET = 5.5;
 
 
         public static final double SHOT_MEDIUM = 14000;
-        public static final double AUTO_SHOT_Y = -8;
+        public static final double AUTO_SHOT_Y = -14; //-8
 
-        public static final double XDeadband = 3;
-        public static final double YDeadband = 3;
+        public static final double XDeadband = 2; //3
+        public static final double YDeadband = 2; //3
 
 
         public static final long TARGET_STALE = 100;
@@ -186,5 +187,10 @@ public class Constants {
         public static final double SPIT_SPEED = 7000;
         public static final int SWITCH1_ID = 1;
         public static final int SWITCH2_ID = 0;
+    }
+    public static final class Climber{
+        public static final boolean EXISTS = false;
+        public static final int MOTOR_ID = 30;
+        public static final double SPEED = 1;
     }
 }

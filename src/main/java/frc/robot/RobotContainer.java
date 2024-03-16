@@ -23,6 +23,7 @@ import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.SensorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 public class RobotContainer 
@@ -32,6 +33,7 @@ public class RobotContainer
   private final SwerveSubsystem swerveSubsystem;
   private final ShooterSubsystem shooterSubsystem;
   private final IntakeSubsystem intakeSubsystem;
+  private final ClimberSubsystem climberSubsystem;
 
   private final Joystick driverJoystick = new Joystick(Control.kDriverControllerPort);
   private final Joystick operatorJoystick = new Joystick(Control.kOperatorControllerPort);
@@ -43,6 +45,7 @@ public class RobotContainer
     swerveSubsystem = new SwerveSubsystem(sensorSubsystem);
     shooterSubsystem = Constants.Shooter.EXISTS ? new ShooterSubsystem():null;
     intakeSubsystem = Constants.Intake.EXISTS ? new IntakeSubsystem():null;
+    climberSubsystem = Constants.Climber.EXISTS ? new ClimberSubsystem():null;
 
     swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
         driverJoystick,
@@ -50,7 +53,8 @@ public class RobotContainer
         swerveSubsystem, 
         sensorSubsystem,
         shooterSubsystem,
-        intakeSubsystem));
+        intakeSubsystem,
+        climberSubsystem));
 
     configureBindings();
 
@@ -135,20 +139,22 @@ public class RobotContainer
     }
     else{
       //blue
-      if(angle>90 && angle<165){
+      if(angle>90 && angle<170){
         System.out.println("B1");
         //1
         auto = new SequentialCommandGroup(
-        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 0,0,0,160),
+        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 0,0,0,140), // deg 160
         new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_HIGH, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem),
-        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 180,0.3,0.1,160),
+        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 180,0.3,0.2,140),
         new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem),
         new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem),
                 isMidfield?
         new SequentialCommandGroup(
-        new AutoDriveCommand(swerveSubsystem,sensorSubsystem,280,0.8, 3,170),
+        new AutoDriveCommand(swerveSubsystem,sensorSubsystem,280,1, 4.5,180),
         new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout(2.0),
-        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 90,0.8, 6, 160),
+        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 90,1, 6, 180),
+        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 90,1, 1, 140),
+
         // new AutoDriveCommand(swerveSubsystem, 250, 0.5, 2, 20),
         new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem)):
         new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 180)

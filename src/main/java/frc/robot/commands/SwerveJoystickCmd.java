@@ -16,10 +16,12 @@ import frc.robot.Constants.Drive;
 import frc.robot.Constants.Intake;
 import frc.robot.Constants.Shooter;
 import frc.robot.Constants;
+import frc.robot.Constants.Climber;
 import frc.robot.Constants.Control;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.SensorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 
@@ -30,6 +32,7 @@ public class SwerveJoystickCmd extends Command
   private final SensorSubsystem sensorSubsystem;
   private final ShooterSubsystem shooterSubsystem;
   private final IntakeSubsystem intakeSubsystem;
+  private final ClimberSubsystem climberSubsystem;
 
 
   private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
@@ -47,7 +50,8 @@ public class SwerveJoystickCmd extends Command
     SwerveSubsystem swerveSubsystem, 
     SensorSubsystem sensorSubsystem,
     ShooterSubsystem shootersubsystem,
-    IntakeSubsystem intakeSubsystem)
+    IntakeSubsystem intakeSubsystem,
+    ClimberSubsystem climberSubsystem)
   
 {
     this.driverJoystick = driverJoystick;   
@@ -57,6 +61,7 @@ public class SwerveJoystickCmd extends Command
     this.sensorSubsystem = sensorSubsystem;
     this.swerveSubsystem = swerveSubsystem;
     this.shooterSubsystem = shootersubsystem;
+    this.climberSubsystem = climberSubsystem;
     this.xLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAccelerationUnitsPerSecond);
     this.yLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAccelerationUnitsPerSecond);
     this.turningLimiter = new SlewRateLimiter(Drive.kTeleDriveMaxAngularAccelerationUnitsPerSecond);
@@ -114,8 +119,21 @@ public class SwerveJoystickCmd extends Command
     
     double intakeAxis = operatorJoystick.getRawAxis(Control.LEFT_Y_AXIS);
     double shooterAxis = operatorJoystick.getRawAxis(Control.LEFT_TRIGGER);
+    double climbAxis = operatorJoystick.getRawAxis(Control.RIGHT_Y_AXIS);
     int tiltAxis = operatorJoystick.getPOV();
     // double feedAxis = operatorJoystick.getRawAxis(Control.RIGHT_TRIGGER);
+    if(climberSubsystem!=null){
+      if(climbAxis>0.5){
+        climberSubsystem.set(Climber.SPEED);
+      }
+      else if(climbAxis<-0.5){
+        climberSubsystem.set(-Climber.SPEED);
+      }
+      else{
+        climberSubsystem.set(0);
+      }
+    }
+
     if(tiltAxis==Constants.Control.DAXISN){
       shooterSubsystem.setTiltPosition(Shooter.TILT_HIGH);
       sensorSubsystem.setTargetYOffset(Shooter.TILT_HIGH);
@@ -140,10 +158,9 @@ public class SwerveJoystickCmd extends Command
       if(intakeAxis<-0.5 && !intakeSubsystem.isShotReady()){
         intakeSpeed=Constants.Intake.INTAKE_SPEED;
       }
-      
-      // else if(intakeAxis>0.5){
-      //   intakeSpeed=Constants.Intake.SPIT_SPEED;
-      // }
+      else if(intakeAxis>0.5){
+        intakeSpeed=Constants.Intake.SPIT_SPEED;
+      }
       // else if(feedAxis>0.5){
       //   intakeSubsystem.setIntakeSpeed(Intake.FEED_SPEED);
       // }
