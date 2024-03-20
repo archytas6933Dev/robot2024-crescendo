@@ -141,6 +141,8 @@ public class Constants {
         public static final double TILT_LOW = 300000;
         public static final double TILT_MEDIUM = 250000;
         public static final double TILT_HIGH = 200000;
+        public static final double TILT_CLIMB = 100000;
+
 
         public static final double HIGH_OFFSET = -10;
         public static final double MEDIUM_OFFSET = -3.0; //-1.5
@@ -148,7 +150,7 @@ public class Constants {
 
 
         public static final double SHOT_MEDIUM = 14000;
-        public static final double AUTO_SHOT_Y = -14; //-8
+        public static final double AUTO_SHOT_Y = -8; //-14
 
         public static final double XDeadband = 2; //3
         public static final double YDeadband = 2; //3
@@ -189,7 +191,7 @@ public class Constants {
         public static final int SWITCH2_ID = 0;
     }
     public static final class Climber{
-        public static final boolean EXISTS = false;
+        public static final boolean EXISTS = true;
         public static final int MOTOR_ID = 30;
         public static final double SPEED = 1;
     }

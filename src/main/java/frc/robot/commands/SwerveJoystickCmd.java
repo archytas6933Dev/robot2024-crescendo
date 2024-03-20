@@ -43,6 +43,7 @@ public class SwerveJoystickCmd extends Command
   private boolean autoMode = false;
   private long shotTimer = -1;
   private long intakeTimer = -1;
+  private boolean isClimbing = false;
   
   public SwerveJoystickCmd(
     Joystick driverJoystick, 
@@ -100,8 +101,9 @@ public class SwerveJoystickCmd extends Command
     if(autoMode && sensorSubsystem.isNoteClose() && !intakeSubsystem.hasNote() && !isShooting){
       isAutoIntake = true;
     }
-    if(autoMode && sensorSubsystem.isTargetClose() && intakeSubsystem.isShotReady() && 
-          (driverJoystick.getRawAxis(Control.RIGHT_TRIGGER)>0.5)){
+    if(autoMode && sensorSubsystem.isTargetClose() && intakeSubsystem.isShotReady() 
+    // && (driverJoystick.getRawAxis(Control.RIGHT_TRIGGER)>0.5)
+    ){
       isAutoShoot = true;
     }
     if(shotTimer>0){
@@ -124,14 +126,21 @@ public class SwerveJoystickCmd extends Command
     // double feedAxis = operatorJoystick.getRawAxis(Control.RIGHT_TRIGGER);
     if(climberSubsystem!=null){
       if(climbAxis>0.5){
+        isClimbing = true;
+        shooterSubsystem.setTiltPosition(0);
         climberSubsystem.set(Climber.SPEED);
       }
       else if(climbAxis<-0.5){
+        shooterSubsystem.setTiltPosition(Shooter.TILT_CLIMB);
         climberSubsystem.set(-Climber.SPEED);
       }
       else{
         climberSubsystem.set(0);
       }
+    }
+
+    if(operatorJoystick.getRawButton(Control.RIGHTJOYCLICK)){
+      isClimbing = false;
     }
 
     if(tiltAxis==Constants.Control.DAXISN){
@@ -182,7 +191,7 @@ public class SwerveJoystickCmd extends Command
     // sensorSubsystem.setTargetRotation(Math.toDegrees(Math.atan2(-xTurn,yTurn)) % 360);
     double turnSpeed = 0;
 
-    if(Math.abs(xTurn) + Math.abs(yTurn) > 0.5 && !isAutoIntake && !isAutoShoot && isFieldCentric) {
+    if(Math.abs(xTurn) + Math.abs(yTurn) > 0.5 && !isAutoIntake && !isAutoShoot && isFieldCentric && !isClimbing) {
       if(intakeSubsystem.hasNote()){
         xTurn = -xTurn;
         yTurn = -yTurn;
@@ -195,11 +204,11 @@ public class SwerveJoystickCmd extends Command
     turnSpeed = swerveSubsystem.turnForAngle(sensorSubsystem.getTargetRotation());
 
 
-    if(driverJoystick.getRawButton(Control.RBBUTTON)){
+    if(driverJoystick.getRawButton(Control.RBBUTTON) && !isClimbing){
       turnSpeed = 0.5;
     }
 
-    if(driverJoystick.getRawButton(Control.LBBUTTON)){
+    if(driverJoystick.getRawButton(Control.LBBUTTON) && !isClimbing){
       turnSpeed = -0.5;
     }
 
@@ -215,7 +224,7 @@ public class SwerveJoystickCmd extends Command
     ySpeed = Math.abs(ySpeed) > Control.kDeadband ? ySpeed : 0.0;
    
     //precision mode
-    if(isTrigger){
+    if(isTrigger || isClimbing){
       xSpeed /= 4;
       ySpeed /= 4;
       turnSpeed /= 4;

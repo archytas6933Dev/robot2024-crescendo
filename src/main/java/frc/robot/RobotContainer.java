@@ -75,7 +75,7 @@ public class RobotContainer
     SequentialCommandGroup auto = null;
     if(isRed){
       //red
-      if(angle<360-15 && angle>180){
+      if(angle<345 && angle>180){
         System.out.println("R3");
         //3
         auto = new SequentialCommandGroup(
@@ -98,20 +98,21 @@ public class RobotContainer
         System.out.println("R1");
         //1
         auto = new SequentialCommandGroup(
-        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 0,0,0,20),
+        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 0,0,0,40), // deg 160
         new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_HIGH, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem),
-        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 180,0.3,0.1,20),
+        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 180,0.3,0.2,40),
         new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem),
         new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem),
-        isMidfield?
+                isMidfield?
         new SequentialCommandGroup(
-        new AutoDriveCommand(swerveSubsystem,sensorSubsystem,70,0.8, 3,10),
-        new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout(2),
-        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 270,0.8, 6, 20),
+        new AutoDriveCommand(swerveSubsystem,sensorSubsystem,80,1, 4.5,10),
+        new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout(2.0),
+        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 270,1, 6, 0),
+        new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 270,1, 1, 40),
+
         // new AutoDriveCommand(swerveSubsystem, 250, 0.5, 2, 20),
         new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem)):
         new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0)
-        
         );
       }
       else{
