@@ -18,6 +18,8 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_robotContainer = new RobotContainer();
     SmartDashboard.putBoolean("midfield auto", true);
+    SmartDashboard.putBoolean("kill auto", false);
+
   }
 
   @Override
