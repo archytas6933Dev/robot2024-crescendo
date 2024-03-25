@@ -139,7 +139,7 @@ public class SwerveJoystickCmd extends Command
       }
     }
 
-    if(operatorJoystick.getRawButton(Control.RIGHTJOYCLICK)){
+    if(operatorJoystick.getRawButton(Control.RIGHTJOYCLICK) || driverJoystick.getRawButton(Control.XBUTTON)){
       isClimbing = false;
     }
 
