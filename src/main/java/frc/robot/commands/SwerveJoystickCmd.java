@@ -191,7 +191,7 @@ public class SwerveJoystickCmd extends Command
     // sensorSubsystem.setTargetRotation(Math.toDegrees(Math.atan2(-xTurn,yTurn)) % 360);
     double turnSpeed = 0;
 
-    if(Math.abs(xTurn) + Math.abs(yTurn) > 0.5 && !isAutoIntake && !isAutoShoot && isFieldCentric && !isClimbing) {
+    if((Math.abs(xTurn) > 0.8) && (Math.abs(yTurn) > 0.8) && !isAutoIntake && !isAutoShoot && isFieldCentric && !isClimbing) {
       if(intakeSubsystem.hasNote()){
         xTurn = -xTurn;
         yTurn = -yTurn;

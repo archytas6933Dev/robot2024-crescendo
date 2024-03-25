@@ -71,6 +71,8 @@ private SlewRateLimiter xLimiter,yLimiter;
     double XDeadband = Constants.Shooter.XDeadband;
     if(shotPosition == Constants.Shooter.TILT_HIGH){
       XDeadband *=4;
+      double angle = Math.abs(swerveSubsystem.getHeading() - 180);
+      if ((angle > 170) || (angle < 10)) XDeadband *= 2; // use wider deadband for center position autos
       YDeadband *=3;
     }
     
