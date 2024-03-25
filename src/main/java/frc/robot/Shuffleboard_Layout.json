@@ -99,27 +99,6 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "0,0": {
-            "size": [
-              5,
-              4
-            ],
-            "content": {
-              "_type": "Camera Stream",
-              "_source0": "camera_server://limelight-shooter",
-              "_title": "limelight-shooter",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Crosshair/Show crosshair": false,
-              "Crosshair/Crosshair color": "#FFFFFFFF",
-              "Controls/Show controls": false,
-              "Controls/Rotation": "NONE",
-              "compression": -1.0,
-              "fps": -1,
-              "imageWidth": 0,
-              "imageHeight": 0
-            }
-          },
           "5,1": {
             "size": [
               1,
@@ -298,9 +277,9 @@
               "_showGlyph": false
             }
           },
-          "0,5": {
+          "1,5": {
             "size": [
-              2,
+              1,
               1
             ],
             "content": {
@@ -437,6 +416,40 @@
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/eye1",
               "_title": "eye1",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "0,0": {
+            "size": [
+              5,
+              4
+            ],
+            "content": {
+              "_type": "Camera Stream",
+              "_source0": "camera_server://limelight-shooter",
+              "_title": "limelight-shooter",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Crosshair/Show crosshair": false,
+              "Crosshair/Crosshair color": "#FFFFFFFF",
+              "Controls/Show controls": false,
+              "Controls/Rotation": "NONE",
+              "compression": -1.0,
+              "fps": -1,
+              "imageWidth": -1,
+              "imageHeight": -1
+            }
+          },
+          "0,5": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Toggle Switch",
+              "_source0": "network_table:///SmartDashboard/kill auto",
+              "_title": "kill auto",
               "_glyph": 148,
               "_showGlyph": false
             }
