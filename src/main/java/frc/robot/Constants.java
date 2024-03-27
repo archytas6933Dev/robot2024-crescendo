@@ -122,14 +122,14 @@ public class Constants {
     }
     public static final class Shooter {
         public static final boolean EXISTS = true;
-        public static final double MOTOR_VELOCITY_F = 0.005; //0.011;
-        public static final double MOTOR_VELOCITY_P = 0.001; //0.25
-        public static final double MOTOR_VELOCITY_I = 0.00015;
-        public static final double MOTOR_VELOCITY_D = 2.0;
+        public static final double MOTOR_VELOCITY_F = 0.04; //0.005 0.011;
+        public static final double MOTOR_VELOCITY_P = 0.07; //0.001 0.25
+        public static final double MOTOR_VELOCITY_I = 0.00005; //0.00015
+        public static final double MOTOR_VELOCITY_D = 2;
         public static final int MOTOR_ID = 0;
         public static final int FOLLOWER_ID = 0;
-        public static final long SHOTTOTALTIME = 1000; // in milliseconds
-        public static final double SHOT_TOLERANCE = 500;
+        public static final long SHOTTOTALTIME = 150; // 1000; // in milliseconds
+        public static final double SHOT_TOLERANCE = 1000;
 
         public static final double TILT_POSITION_F = 0; //0.011;
         public static final double TILT_POSITION_P = 0.03; //0.25
@@ -146,7 +146,7 @@ public class Constants {
 
         public static final double HIGH_OFFSET = -11;
         public static final double MEDIUM_OFFSET = -3.0; //-1.5
-        public static final double LOW_OFFSET = 4;
+        public static final double LOW_OFFSET = 3; // 4;
 
 
         public static final double SHOT_MEDIUM = 14000;
@@ -161,6 +161,8 @@ public class Constants {
 
         public static final double kSVolts = 0;
         public static final double kVVoltSecondsPerRotation = 0;
+                public static final double CLOSE_TAG_THRESHOLD = 10;
+
 
     }
     public static final class Intake {
@@ -178,9 +180,9 @@ public class Constants {
 
         public static final double AUTO_NOTE_Y = 40;
 
-        public static final long NOTE_STALE = 500;
+        public static final long NOTE_STALE = 100; // 500;
         public static final long GRABBED_STALE = 500;
-        public static final long SHOT_STALE = 500;
+        public static final long SHOT_STALE = 100; // 500
         public static final long INTAKE_STALE = 1000;
 
 

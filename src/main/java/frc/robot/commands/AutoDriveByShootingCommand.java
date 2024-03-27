@@ -25,13 +25,18 @@ public class AutoDriveByShootingCommand extends Command {
 private SlewRateLimiter xLimiter,yLimiter;
 
   private long shotTime = -1;
+  private boolean iswide = false;
+  private boolean isdoubleshot = false;
+
   public AutoDriveByShootingCommand( 
   double shotSpeed,  
   double shotPosition, 
   SwerveSubsystem swerveSubsystem, 
   SensorSubsystem sensorSubsystem,
   IntakeSubsystem intakeSubsystem,
-  ShooterSubsystem shooterSubsystem) {
+  ShooterSubsystem shooterSubsystem,
+  boolean isdoubleshot) {
+    this.isdoubleshot = isdoubleshot;
     this.shotSpeed = shotSpeed;
     this.shotPosition = shotPosition;
     this.sensorSubsystem = sensorSubsystem;
@@ -55,37 +60,41 @@ private SlewRateLimiter xLimiter,yLimiter;
     shooterSubsystem.setshotspeed(shotSpeed);
     shooterSubsystem.setTiltPosition(shotPosition);
     sensorSubsystem.setTargetYOffset(shotPosition);
+    double angle = Math.abs(swerveSubsystem.getHeading() - 180);
+    if ((angle > 170) || (angle < 10)) {
+      System.out.println("wide vision");
+      iswide = true; // use wider deadband for center position autos
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   //execute when target can be seen and driven straight towards
   public void execute() {
-    // Set drive speed based on april tags for target
-    if(sensorSubsystem.isAtLeastOneTag()){
-
-
-    double xSpeed = -sensorSubsystem.shotTargetX / 30;
-    double ySpeed = sensorSubsystem.shotTargetY / 30;
-    double YDeadband = Constants.Shooter.YDeadband;
-    double XDeadband = Constants.Shooter.XDeadband;
-    if(shotPosition == Constants.Shooter.TILT_HIGH){
-      XDeadband *=4;
-      double angle = Math.abs(swerveSubsystem.getHeading() - 180);
-      if ((angle > 170) || (angle < 10)) XDeadband *= 2; // use wider deadband for center position autos
-      YDeadband *=3;
-    }
-    
-    if(( Math.abs(sensorSubsystem.shotTargetX) <= XDeadband 
-    && Math.abs(sensorSubsystem.shotTargetY) <= YDeadband 
-    && shooterSubsystem.isReady()) || shotTime>0){
-      intakeSubsystem.setIntakeSpeed(Constants.Intake.FEED_SPEED);
-      xSpeed = 0;
-      ySpeed = 0;
-      if(shotTime==-1){
-        shotTime = sensorSubsystem.getTime();
+    // default to slow drive forward
+    double xSpeed = 0;
+    double ySpeed = 0.2;
+    // If available, set drive speed based on april tags for target
+    if (sensorSubsystem.isAtLeastOneTag()){
+      xSpeed = -sensorSubsystem.shotTargetX / 30;
+      ySpeed = sensorSubsystem.shotTargetY / 30;
+      double YDeadband = Constants.Shooter.YDeadband;
+      double XDeadband = Constants.Shooter.XDeadband;
+      if(shotPosition == Constants.Shooter.TILT_HIGH){
+        XDeadband *= iswide ? 8 : 4;
+        YDeadband *=3;
       }
-
+      
+      if(( Math.abs(sensorSubsystem.shotTargetX) <= XDeadband 
+      && Math.abs(sensorSubsystem.shotTargetY) <= YDeadband 
+      && shooterSubsystem.isReady()) || shotTime>0){
+        intakeSubsystem.setIntakeSpeed(Constants.Intake.FEED_SPEED);
+        xSpeed = 0;
+        ySpeed = 0;
+        if(shotTime==-1){
+          shotTime = sensorSubsystem.getTime();
+        }
+      }
     }
     double turnSpeed = swerveSubsystem.turnForAngle(sensorSubsystem.getTargetRotation());
     xSpeed = xLimiter.calculate(xSpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
@@ -95,19 +104,20 @@ private SlewRateLimiter xLimiter,yLimiter;
 
     SwerveModuleState[] moduleStates = Drive.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
     swerveSubsystem.setModuleStates(moduleStates);
-    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    shooterSubsystem.setshotspeed(0);
+    if (!isdoubleshot) // turn off shooter if not getting second note
+      shooterSubsystem.setshotspeed(0);
     intakeSubsystem.setIntakeSpeed(0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return(shotTime != -1 && sensorSubsystem.getTime() > shotTime + Constants.Shooter.SHOTTOTALTIME);
+    return(shotTime != -1 && !intakeSubsystem.isShotReady() && 
+      (sensorSubsystem.getTime() > shotTime + Constants.Shooter.SHOTTOTALTIME));
   }
 }

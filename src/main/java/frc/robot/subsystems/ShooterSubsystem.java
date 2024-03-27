@@ -116,9 +116,16 @@ public class ShooterSubsystem extends SubsystemBase {
   public void tiltUp(){
     tilt_.set(ControlMode.PercentOutput, -0.5);
   }
+  public void tiltDown(){
+    tilt_.set(ControlMode.PercentOutput, 0.5);
+  }
+
 
   @Override
   public void periodic() {
+    // if(tilt_.isFwdLimitSwitchClosed() == 0){
+    //   tilt_.setSelectedSensorPosition(0);
+    // }
     if(tilt_.isRevLimitSwitchClosed() == 0){
       tilt_.setSelectedSensorPosition(0);
     }

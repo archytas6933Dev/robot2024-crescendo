@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.Control;
 import frc.robot.Constants.Intake;
 import frc.robot.Constants.Shooter;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -30,6 +31,8 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableEntry;
 
+import edu.wpi.first.wpilibj.DigitalOutput;
+
 
 public class SensorSubsystem extends SubsystemBase {
 
@@ -45,6 +48,7 @@ public class SensorSubsystem extends SubsystemBase {
   public double currentRobotRot;
 
   private boolean canSee;
+  private boolean isTagsClose;
   private boolean canSeeNote;
   private boolean atLeastOneTarget= false;
   private double targetRotation = 0;
@@ -55,6 +59,8 @@ public class SensorSubsystem extends SubsystemBase {
   public boolean isRed;
   private double targetYOffset = 0;
 
+  private DigitalOutput led1;
+  private DigitalOutput led2;
 
   private AnalogInput eye1;
   private AnalogInput eye2;
@@ -63,10 +69,11 @@ public class SensorSubsystem extends SubsystemBase {
   public SensorSubsystem() 
   {
     gyro_ = new AHRS(SPI.Port.kMXP);
-    eye1 = new AnalogInput(0);
-      eye2 = new AnalogInput(1);
+    // eye1 = new AnalogInput(0);
+    // eye2 = new AnalogInput(1);
 
-
+    // led1 = new DigitalOutput(3);
+    // led2 = new DigitalOutput(4);
   }
 
 
@@ -89,6 +96,9 @@ public class SensorSubsystem extends SubsystemBase {
 
   public boolean canSeeTags(){
     return canSee;
+  }
+  public boolean tagsClose(){
+    return isTagsClose;
   }
 
   public boolean isAtLeastOneTag(){
@@ -130,12 +140,22 @@ public class SensorSubsystem extends SubsystemBase {
     }
   }
 
+  public void setled1(boolean isOn)
+  {
+    // led1.set(!isOn);
+  }
+
+  public void setled2(boolean isOn)
+  {
+    // led2.set(!isOn);
+  }
+
   @Override
   public void periodic() 
   {
 
-    SmartDashboard.putNumber("eye1", eye1.getVoltage());
-    SmartDashboard.putNumber("eye2", eye2.getVoltage());
+    // SmartDashboard.putNumber("eye1", eye1.getVoltage());
+    // SmartDashboard.putNumber("eye2", eye2.getVoltage());
 
     curTime = System.currentTimeMillis();
     // This method will be called once per scheduler run
@@ -176,6 +196,8 @@ public class SensorSubsystem extends SubsystemBase {
     NetworkTableEntry jsonStuff = shooterTable.getEntry("json");
     ObjectMapper mapper = new ObjectMapper();
     int numMarkers = 0;
+    int numTargets = 0;
+    atLeastOneTarget = false;
     try {
       JsonNode root = mapper.readTree(jsonStuff.getString(""));
       // JsonNode results = root.path("Results");
@@ -183,8 +205,13 @@ public class SensorSubsystem extends SubsystemBase {
 
       for(int i=0;i<tags.size();i++){
         int tagNum = tags.get(i).path("fID").asInt();
+        if(tags.get(i).path("t6t_cs").get(2).asDouble(100000)<Shooter.CLOSE_TAG_THRESHOLD){
+          numMarkers++;
+
+        }
         //speaker
         if((tagNum==4 && isRed) || (tagNum == 7 && !isRed)){
+          atLeastOneTarget = true;
           shotTargetX = tags.get(i).path("tx").asDouble();
           shotTargetY = tags.get(i).path("ty").asDouble()+targetYOffset;
           lastSawTarget = curTime;
@@ -197,7 +224,7 @@ public class SensorSubsystem extends SubsystemBase {
 
 
       
-      numMarkers = tags.size();
+      numTargets = tags.size();
     } catch (JsonMappingException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -207,13 +234,13 @@ public class SensorSubsystem extends SubsystemBase {
     }
 
     canSee = false;
-    if(numMarkers >= 2){
+    if(numTargets >= 2){
       canSee = true;
       currentRobotX = -botpose[0];
       currentRobotY = botpose[1];
       currentRobotRot = -botpose[5];
     }
-    else if(numMarkers==0){
+    else if(numTargets==0){
       if(lastSawTarget<curTime-Constants.Shooter.TARGET_STALE){
         shotTargetX = Double.NaN;
         shotTargetY = Double.NaN;
@@ -221,13 +248,12 @@ public class SensorSubsystem extends SubsystemBase {
 
     }
 
-    if(numMarkers>=1){
-      atLeastOneTarget = true;
+    if(numMarkers>=2){
+      isTagsClose = true;
     }
     else{
-      atLeastOneTarget = false;
+      isTagsClose = false;
     }
-
     // currentX = tx.getDouble(0.0);
     // currentY = ty.getDouble(0.0);
     // double[] rotation = rotationEntry.getDoubleArray(new double[0]);
@@ -252,7 +278,7 @@ public class SensorSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("shot Y", shotTargetY);
     SmartDashboard.putBoolean("alliance", isRed);
         SmartDashboard.putBoolean("isNoteVisible", isNoteVisible());
-
+      SmartDashboard.putBoolean("isTagsClose", isTagsClose);
     // SmartDashboard.putNumber("robot X", currentRobotX);
     // SmartDashboard.putNumber("robot Y", currentRobotY);
     // SmartDashboard.putNumber("robot rotation", currentRobotRot);

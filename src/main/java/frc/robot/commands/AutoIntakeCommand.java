@@ -50,7 +50,7 @@ public class AutoIntakeCommand extends Command {
     //Set speeds based on note position on screen
     double xSpeed = sensorSubsystem.noteTargetX / 60;
     double ySpeed = 0.5;
-    //if(intakeSubsystem.isGrabbed()) ySpeed = 0;
+    if(intakeSubsystem.isGrabbed()) ySpeed = 0.1;
     xSpeed = xLimiter.calculate(xSpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
     ySpeed = yLimiter.calculate(ySpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
 

@@ -114,7 +114,7 @@ public class SwerveSubsystem extends SubsystemBase
         updateDashboard();
         if(poseEstimator !=null){
             poseEstimator.update(getRotation2d(), new SwerveModulePosition[]{frontLeft.getPosition(),frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()});
-            if(sensorsubsystem.canSeeTags()){
+            if(sensorsubsystem.tagsClose()){
                 poseEstimator.addVisionMeasurement(sensorsubsystem.getPosition(),Timer.getFPGATimestamp());
                 if(!hasSetHeading){
                     sensorsubsystem.setTargetRotation(sensorsubsystem.getPosition().getRotation().getDegrees());
