@@ -156,13 +156,16 @@ public class SwerveJoystickCmd extends Command
       shooterSubsystem.setTiltPosition(Shooter.TILT_LOW);
       sensorSubsystem.setTargetYOffset(Shooter.TILT_LOW);
 
-    } 
+    }
+    
     if(operatorJoystick.getRawButton(Control.XBUTTON)){
       shooterSubsystem.tiltDown();
     }
-    if(operatorJoystick.getRawButton(Control.YBUTTON)){
+    else if(operatorJoystick.getRawButton(Control.YBUTTON)){
       shooterSubsystem.tiltUp();
     }
+    else shooterSubsystem.tiltStop();
+
     double intakeSpeed = 0;
     double shotSpeed = 0;
 
@@ -180,7 +183,7 @@ public class SwerveJoystickCmd extends Command
       if(shooterAxis>0.5){
         // shotSpeed = SmartDashboard.getNumber("Shot Speed", shotSpeed);
         shotSpeed = Constants.Shooter.SHOT_MEDIUM;
-        if((shooterSubsystem.isReady() && intakeSubsystem.isShotReady()) || isShooting){
+        if((shooterSubsystem.isReady() /* && intakeSubsystem.isShotReady()*/) || isShooting){
           intakeSpeed = Intake.FEED_SPEED;
           isShooting = true;
         }
@@ -195,13 +198,14 @@ public class SwerveJoystickCmd extends Command
 
     double turnvector = Math.sqrt(xTurn * xTurn + yTurn * yTurn);
 
-    if((turnvector > 0.8) && !isAutoIntake && !isAutoShoot && isFieldCentric && !isClimbing) {
+    if((turnvector > 0.9) && !isAutoIntake && !isAutoShoot && isFieldCentric && !isClimbing) {
       if(intakeSubsystem.hasNote()){
         xTurn = -xTurn;
         yTurn = -yTurn;
       }
-      sensorSubsystem.setTargetRotation(Math.toDegrees(Math.atan2(xTurn,-yTurn)) % 360);
-    
+      double targetangle = Math.toDegrees(Math.atan2(xTurn,-yTurn)) % 360;
+      targetangle = (double)((((int)targetangle + 15) / 30) * 30);
+      sensorSubsystem.setTargetRotation(targetangle);
     }
 
     
@@ -218,7 +222,7 @@ public class SwerveJoystickCmd extends Command
 
 
     if(!isFieldCentric && !isAutoIntake && !isAutoShoot){
-      double currentRotation = swerveSubsystem.getPos().getRotation().getDegrees() % 360 - 180;
+      double currentRotation = swerveSubsystem.getPos().getRotation().getDegrees() % 360;// - 180;
       sensorSubsystem.setTargetRotation(currentRotation);
       turnSpeed = xTurn;
       turnSpeed = Math.abs(turnSpeed) > Control.kDeadband ? turnSpeed : 0.0;
@@ -240,7 +244,8 @@ public class SwerveJoystickCmd extends Command
 
     if(isAutoIntake){
       isFieldCentric = false;
-      xSpeed = sensorSubsystem.noteTargetX / 60;
+      xSpeed = sensorSubsystem.noteTargetX / 100; // translation auto
+      turnSpeed = sensorSubsystem.noteTargetX / 100; // rotation auto
       ySpeed = 0.8;
       if (intakeSubsystem.isGrabbed()) ySpeed = 0.1;
       xSpeed = Math.abs(xSpeed) > Control.kDeadband ? xSpeed : 0.0;
@@ -357,7 +362,7 @@ public class SwerveJoystickCmd extends Command
     SmartDashboard.putBoolean("auto shoot", isAutoShoot);
 
     sensorSubsystem.setled1(isClimbing);
-    sensorSubsystem.setled2(intakeSubsystem.isShotReady());
+    sensorSubsystem.setled2(!isClimbing && intakeSubsystem.isShotReady());
 
     //SmartDashboard.putNumber("angle", angle);
 

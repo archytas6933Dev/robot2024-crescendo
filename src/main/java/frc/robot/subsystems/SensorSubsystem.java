@@ -10,7 +10,9 @@ import frc.robot.Constants.Control;
 import frc.robot.Constants.Intake;
 import frc.robot.Constants.Shooter;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Relay.Direction;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.lang.reflect.Array;
@@ -32,6 +34,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableEntry;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.Relay;
 
 
 public class SensorSubsystem extends SubsystemBase {
@@ -62,18 +65,23 @@ public class SensorSubsystem extends SubsystemBase {
   private DigitalOutput led1;
   private DigitalOutput led2;
 
-  private AnalogInput eye1;
-  private AnalogInput eye2;
+  private Relay relay1;
+  private Relay relay2;
+
+  private DigitalInput eye1;
+  private DigitalInput eye2;
 
   /** Creates a new SensorSubsystem. */
   public SensorSubsystem() 
   {
     gyro_ = new AHRS(SPI.Port.kMXP);
-    // eye1 = new AnalogInput(0);
-    // eye2 = new AnalogInput(1);
+    eye1 = new DigitalInput(6);
+    eye2 = new DigitalInput(7);
 
-    // led1 = new DigitalOutput(3);
-    // led2 = new DigitalOutput(4);
+    led1 = new DigitalOutput(8);
+    led2 = new DigitalOutput(9);
+    // relay1 = new Relay(0);
+    // relay2 = new Relay(1);
   }
 
 
@@ -142,20 +150,22 @@ public class SensorSubsystem extends SubsystemBase {
 
   public void setled1(boolean isOn)
   {
-    // led1.set(!isOn);
+    led1.set(!isOn);
+    // relay1.setDirection(isOn ? Direction.kForward : Direction.kReverse);
   }
 
   public void setled2(boolean isOn)
   {
-    // led2.set(!isOn);
+    led2.set(!isOn);
+    // relay2.setDirection(isOn ? Direction.kForward : Direction.kReverse);
   }
 
   @Override
   public void periodic() 
   {
 
-    // SmartDashboard.putNumber("eye1", eye1.getVoltage());
-    // SmartDashboard.putNumber("eye2", eye2.getVoltage());
+    SmartDashboard.putBoolean("eye1", eye1.get());
+    SmartDashboard.putBoolean("eye2", eye2.get());
 
     curTime = System.currentTimeMillis();
     // This method will be called once per scheduler run
@@ -197,6 +207,7 @@ public class SensorSubsystem extends SubsystemBase {
     ObjectMapper mapper = new ObjectMapper();
     int numMarkers = 0;
     int numTargets = 0;
+    double farthestmarker = 0;
     atLeastOneTarget = false;
     try {
       JsonNode root = mapper.readTree(jsonStuff.getString(""));
@@ -204,16 +215,18 @@ public class SensorSubsystem extends SubsystemBase {
       JsonNode tags = root.path("Results").path("Fiducial");
 
       for(int i=0;i<tags.size();i++){
-        int tagNum = tags.get(i).path("fID").asInt();
-        if(tags.get(i).path("t6t_cs").get(2).asDouble(100000)<Shooter.CLOSE_TAG_THRESHOLD){
+        JsonNode tag = tags.get(i);
+        int tagNum = tag.path("fID").asInt();
+        double distance = tag.path("t6t_cs").get(2).asDouble(100000);
+        if (distance < Shooter.CLOSE_TAG_THRESHOLD) {
           numMarkers++;
-
+          if (distance > farthestmarker) farthestmarker = distance;
         }
         //speaker
         if((tagNum==4 && isRed) || (tagNum == 7 && !isRed)){
           atLeastOneTarget = true;
-          shotTargetX = tags.get(i).path("tx").asDouble();
-          shotTargetY = tags.get(i).path("ty").asDouble()+targetYOffset;
+          shotTargetX = tag.path("tx").asDouble();
+          shotTargetY = tag.path("ty").asDouble()+targetYOffset;
           lastSawTarget = curTime;
         }
         //amp
@@ -272,17 +285,18 @@ public class SensorSubsystem extends SubsystemBase {
     // SmartDashboard.putNumber("Obstacle 2", obstacle2);
 
     // SmartDashboard.putNumber("Heading", gyro_.getAngle());
-    SmartDashboard.putNumber("note X", noteTargetX);
-    SmartDashboard.putNumber("note Y", noteTargetY);
+    //SmartDashboard.putNumber("note X", noteTargetX);
+    //SmartDashboard.putNumber("note Y", noteTargetY);
     SmartDashboard.putNumber("shot X", shotTargetX);
     SmartDashboard.putNumber("shot Y", shotTargetY);
     SmartDashboard.putBoolean("alliance", isRed);
-        SmartDashboard.putBoolean("isNoteVisible", isNoteVisible());
-      SmartDashboard.putBoolean("isTagsClose", isTagsClose);
+    SmartDashboard.putBoolean("isNoteVisible", isNoteVisible());
+    SmartDashboard.putBoolean("isTagsClose", isTagsClose);
+    SmartDashboard.putNumber("farthestag", farthestmarker);
     // SmartDashboard.putNumber("robot X", currentRobotX);
     // SmartDashboard.putNumber("robot Y", currentRobotY);
     // SmartDashboard.putNumber("robot rotation", currentRobotRot);
-    SmartDashboard.putNumber("number of markers", numMarkers);
+    // SmartDashboard.putNumber("number of markers", numMarkers);
     SmartDashboard.putNumber("target rotation", targetRotation);
 
 

@@ -105,13 +105,16 @@ public class ShooterSubsystem extends SubsystemBase {
     // }
 
     left_.set(ControlMode.Velocity, requestedSpeed);
-    right_.set(ControlMode.Velocity, -requestedSpeed*.7);
+    right_.set(ControlMode.Velocity, -requestedSpeed); //*.7);
     }
 
   }
-  public boolean isReady(){
-    
-    return(Math.abs(left_.getSelectedSensorVelocity()-requestedSpeed)<=Shooter.SHOT_TOLERANCE) && Math.abs(requestedSpeed)!=0  && getTiltSpeed()<Constants.Shooter.TILT_THRESHOLD;
+
+  public boolean isReady()
+  {  
+//    return(Math.abs(left_.getSelectedSensorVelocity()-requestedSpeed)<=Shooter.SHOT_TOLERANCE) && Math.abs(requestedSpeed)!=0  && getTiltSpeed()<Constants.Shooter.TILT_THRESHOLD;
+    return(Math.abs(left_.getSelectedSensorVelocity()) > requestedSpeed - Shooter.SHOT_TOLERANCE) 
+      && (Math.abs(requestedSpeed) != 0) && (getTiltSpeed() < Constants.Shooter.TILT_THRESHOLD);
   }
   public void tiltUp(){
     tilt_.set(ControlMode.PercentOutput, -0.5);
@@ -119,15 +122,23 @@ public class ShooterSubsystem extends SubsystemBase {
   public void tiltDown(){
     tilt_.set(ControlMode.PercentOutput, 0.5);
   }
+  public void tiltStop() {
+    if (tilt_.getControlMode() == ControlMode.PercentOutput)
+      tilt_.set(ControlMode.PercentOutput, 0);
+  }
 
+  public void initializeTiltPosition(double sensorpos)
+  {
+    tilt_.setSelectedSensorPosition(sensorpos);
+  }
 
   @Override
   public void periodic() {
     // if(tilt_.isFwdLimitSwitchClosed() == 0){
     //   tilt_.setSelectedSensorPosition(0);
     // }
-    if(tilt_.isRevLimitSwitchClosed() == 0){
-      tilt_.setSelectedSensorPosition(0);
+    if(tilt_.isRevLimitSwitchClosed() == 0) {
+      initializeTiltPosition(0);
     }
     // This method will be called once per scheduler run
     // SmartDashboard.putNumber("requested speed", requestedSpeed);
@@ -135,7 +146,7 @@ public class ShooterSubsystem extends SubsystemBase {
     // SmartDashboard.putNumber("Shooter Speed left", left_.getSelectedSensorVelocity());
     // SmartDashboard.putNumber("Shooter Speed right", right_.getSelectedSensorVelocity());
     SmartDashboard.putNumber("Tilt position", getTiltPosition());
-    SmartDashboard.putNumber("Tilt speed", getTiltSpeed());
+    // SmartDashboard.putNumber("Tilt speed", getTiltSpeed());
 
 
   }

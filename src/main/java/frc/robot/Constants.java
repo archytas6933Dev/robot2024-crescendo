@@ -138,17 +138,18 @@ public class Constants {
 
         public static final double TILT_THRESHOLD = 100;
 
-        public static final double TILT_LOW = 300000;
-        public static final double TILT_MEDIUM = 250000;
-        public static final double TILT_HIGH = 200000;
+        public static final double TILT_LOW = 270000;
+        public static final double TILT_MEDIUM = 200000; // 250000
+        public static final double TILT_HIGH = 150000;
         public static final double TILT_CLIMB = 50000;//100000
 
 
         public static final double HIGH_OFFSET = -11;
-        public static final double MEDIUM_OFFSET = -3.0; //-1.5
-        public static final double LOW_OFFSET = 3; // 4;
+        public static final double MEDIUM_OFFSET = -6; // -3.0; //-1.5
+        public static final double LOW_OFFSET = 6; // 3; // 4;
 
 
+        public static final double SHOT_SHORT = 10000;
         public static final double SHOT_MEDIUM = 14000;
         public static final double AUTO_SHOT_Y = -8; //-14
 
@@ -161,7 +162,7 @@ public class Constants {
 
         public static final double kSVolts = 0;
         public static final double kVVoltSecondsPerRotation = 0;
-                public static final double CLOSE_TAG_THRESHOLD = 10;
+                public static final double CLOSE_TAG_THRESHOLD = 4;
 
 
     }

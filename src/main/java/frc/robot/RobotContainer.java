@@ -19,6 +19,7 @@ import frc.robot.Constants.Shooter;
 import frc.robot.commands.AutoDriveByShootingCommand;
 import frc.robot.commands.AutoDriveCommand;
 import frc.robot.commands.AutoIntakeCommand;
+import frc.robot.commands.AutoPresetShooter;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.SensorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -70,7 +71,8 @@ public class RobotContainer
     System.out.println("start");
     boolean isRed = sensorSubsystem.isRed;
     boolean isMidfield = SmartDashboard.getBoolean("midfield auto", true);
-    boolean isKillAuto = SmartDashboard.getBoolean("kill auto", false);
+    boolean isKillAuto = false;
+    boolean isFourthNote = SmartDashboard.getBoolean("Fourth note", true);
 
     double angle = swerveSubsystem.getPos().getRotation().getDegrees();
     System.out.println(angle);
@@ -101,44 +103,66 @@ public class RobotContainer
           System.out.println("R1");
           //1
           auto = new SequentialCommandGroup(
-          new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 0,0,0,40), // deg 160
-          new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_HIGH, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, true),
-          new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 180,0.3,0.2,40),
-          new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem),
-          new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, false),
-                  isMidfield?
-          new SequentialCommandGroup(
-          new AutoDriveCommand(swerveSubsystem,sensorSubsystem,80,1, 4.5,10),
-          new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout(2.0),
-          new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 270,1, 6, 0),
-          new AutoDriveCommand(swerveSubsystem,sensorSubsystem, 270,1, 1, 40),
-
-          // new AutoDriveCommand(swerveSubsystem, 250, 0.5, 2, 20),
-          new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, false)):
-          new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0)
+            new AutoPresetShooter(shooterSubsystem, 0, Shooter.TILT_HIGH, Shooter.SHOT_SHORT),
+            new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 40),
+            new AutoDriveByShootingCommand(Shooter.SHOT_SHORT,Shooter.TILT_HIGH, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, true),
+            new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 90,0.3,0.5,20),
+            new AutoPresetShooter(shooterSubsystem, Shooter.TILT_MEDIUM, 0, Shooter.SHOT_MEDIUM),
+            new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem),
+            new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 270,1,1.2,40),
+            new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, false),
+          isMidfield?
+            new SequentialCommandGroup(
+            new AutoDriveCommand(swerveSubsystem, sensorSubsystem,80,1, 4.5,10),
+            new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout(2.0),
+            new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 265,1, 6.5, 0),
+            new AutoPresetShooter(shooterSubsystem, 0, 0, Shooter.SHOT_MEDIUM),
+            new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 270,1, 1, 40),
+            new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, false),
+          isFourthNote?
+              new SequentialCommandGroup(
+              new AutoDriveCommand(swerveSubsystem, sensorSubsystem,80,1, 5.5,-15),
+              new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout(3.0)
+              ):
+              new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0)
+            ):
+            new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0)
           );
         }
         else{
           System.out.println("R2");
           //2
           auto = new SequentialCommandGroup(
-          new AutoDriveCommand(swerveSubsystem,sensorSubsystem,0,0,0,0),
-          new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_HIGH, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, true),
-          // new AutoDriveCommand(swerveSubsystem, 180, 0.4, 1.5, 135),
-          new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem),
-//          new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem),
-          new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_LOW, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, false),
-          isMidfield?
-          new SequentialCommandGroup(
-          new AutoDriveCommand(swerveSubsystem,sensorSubsystem,110,0.8,2.5,0),
-          new AutoDriveCommand(swerveSubsystem,sensorSubsystem,90,0.8,1,0),
-          new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout(2.0),
-          new AutoDriveCommand(swerveSubsystem,sensorSubsystem,270,0.8,3,0),
-
-          new AutoDriveCommand(swerveSubsystem,sensorSubsystem,300,0.8,2,0),
-//          new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem)):
-          new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM,Shooter.TILT_LOW, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, false)):
-          new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0)
+            new AutoPresetShooter(shooterSubsystem, 0, Shooter.TILT_HIGH, Shooter.SHOT_SHORT),
+            new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0),
+            new AutoDriveByShootingCommand(Shooter.SHOT_SHORT, Shooter.TILT_HIGH, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, true),
+            new AutoPresetShooter(shooterSubsystem, Shooter.TILT_LOW, 0, Shooter.SHOT_MEDIUM),
+            new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem),
+            new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM, Shooter.TILT_LOW, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, false),
+          isMidfield ?
+            new SequentialCommandGroup(
+              new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 110, 1, 2.5, 0),
+              new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 90, 1, 1, 0),
+              new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout( 2.0),
+              new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 270, 1, 3, 0),
+              new AutoPresetShooter(shooterSubsystem, 0, 0, Shooter.SHOT_MEDIUM),
+              new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 300, 1, 2.7, 0),
+              new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM, Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, false),
+            isFourthNote?
+              new SequentialCommandGroup(
+                  new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0),
+                  new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 90, 1, 1, 0),
+                  new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 130, 1, 4, -20),
+                  new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout( 2.0),
+                  new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 310, 1, 3, 0),
+                  new AutoPresetShooter(shooterSubsystem, Shooter.TILT_MEDIUM, 0, Shooter.SHOT_MEDIUM),
+                  new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 300, 1, 2.7, 0),
+                  new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM, Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, false),
+                new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0)
+                ) :
+              new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0)
+            ):
+            new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0)
           );
 
         }

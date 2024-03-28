@@ -83,7 +83,7 @@ public class IntakeSubsystem extends SubsystemBase{
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Intake", isGrabbed());
     SmartDashboard.putBoolean("ShotReady", isShotReady());
-    SmartDashboard.putNumber("encoder", encoder.getRate());
+    // SmartDashboard.putNumber("encoder", encoder.getRate());
     //System.out.println(isShotReady() + ", " + feedSwitch.get());
 
   }
