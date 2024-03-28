@@ -125,12 +125,12 @@ public class SwerveJoystickCmd extends Command
     int tiltAxis = operatorJoystick.getPOV();
     // double feedAxis = operatorJoystick.getRawAxis(Control.RIGHT_TRIGGER);
     if(climberSubsystem!=null){
-      if(climbAxis>0.5){
+      if(climbAxis<-0.5){
         isClimbing = true;
         shooterSubsystem.setTiltPosition(0);
         climberSubsystem.set(Climber.SPEED);
       }
-      else if(climbAxis<-0.5){
+      else if(climbAxis>0.5){
         shooterSubsystem.setTiltPosition(Shooter.TILT_CLIMB);
         climberSubsystem.set(-Climber.SPEED);
       }

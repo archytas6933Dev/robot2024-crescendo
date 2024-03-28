@@ -20,6 +20,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("midfield auto", true);
     // SmartDashboard.putBoolean("kill auto", false);
     SmartDashboard.putBoolean("Fourth note", true);
+    SmartDashboard.putNumber("Shot Speed", 7000);
 
   }
 
