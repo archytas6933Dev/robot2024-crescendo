@@ -122,8 +122,8 @@ public class SwerveSubsystem extends SubsystemBase
                 }
             }
             Pose2d position = poseEstimator.getEstimatedPosition();
-            SmartDashboard.putNumber("X", position.getX());
-            SmartDashboard.putNumber("Y", position.getY());
+            // SmartDashboard.putNumber("X", position.getX());
+            // SmartDashboard.putNumber("Y", position.getY());
             SmartDashboard.putNumber("Heading", position.getRotation().getDegrees());
             
         }

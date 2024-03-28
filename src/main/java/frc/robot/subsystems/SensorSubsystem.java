@@ -164,8 +164,8 @@ public class SensorSubsystem extends SubsystemBase {
   public void periodic() 
   {
 
-    SmartDashboard.putBoolean("eye1", eye1.get());
-    SmartDashboard.putBoolean("eye2", eye2.get());
+    // SmartDashboard.putBoolean("eye1", eye1.get());
+    // SmartDashboard.putBoolean("eye2", eye2.get());
 
     curTime = System.currentTimeMillis();
     // This method will be called once per scheduler run
@@ -291,8 +291,8 @@ public class SensorSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("shot Y", shotTargetY);
     SmartDashboard.putBoolean("alliance", isRed);
     SmartDashboard.putBoolean("isNoteVisible", isNoteVisible());
-    SmartDashboard.putBoolean("isTagsClose", isTagsClose);
-    SmartDashboard.putNumber("farthestag", farthestmarker);
+    // SmartDashboard.putBoolean("isTagsClose", isTagsClose);
+    // SmartDashboard.putNumber("farthestag", farthestmarker);
     // SmartDashboard.putNumber("robot X", currentRobotX);
     // SmartDashboard.putNumber("robot Y", currentRobotY);
     // SmartDashboard.putNumber("robot rotation", currentRobotRot);

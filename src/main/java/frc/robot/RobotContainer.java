@@ -154,10 +154,10 @@ public class RobotContainer
                   new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 90, 1, 1, 0),
                   new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 130, 1, 4, -20),
                   new AutoIntakeCommand(swerveSubsystem, sensorSubsystem, intakeSubsystem).withTimeout( 2.0),
-                  new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 310, 1, 3, 0),
-                  new AutoPresetShooter(shooterSubsystem, Shooter.TILT_MEDIUM, 0, Shooter.SHOT_MEDIUM),
-                  new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 300, 1, 2.7, 0),
-                  new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM, Shooter.TILT_MEDIUM, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, false),
+                  new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 310, 1, 4, 0),
+                  new AutoPresetShooter(shooterSubsystem, Shooter.TILT_LOW, 0, Shooter.SHOT_MEDIUM),
+                  new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 300, 1, 2, 0),
+                  new AutoDriveByShootingCommand(Shooter.SHOT_MEDIUM, Shooter.TILT_LOW, swerveSubsystem, sensorSubsystem, intakeSubsystem, shooterSubsystem, false),
                 new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0)
                 ) :
               new AutoDriveCommand(swerveSubsystem, sensorSubsystem, 0, 0, 0, 0)

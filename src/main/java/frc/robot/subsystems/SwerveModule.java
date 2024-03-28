@@ -73,7 +73,7 @@ public class SwerveModule {
         turningPidController = new PIDController(Swerve.kPTurning, 0, 0);
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
 
-        driveMotor.setSmartCurrentLimit(40);
+        driveMotor.setSmartCurrentLimit(Drive.currentlimit);
 
         resetEncoder();
     }

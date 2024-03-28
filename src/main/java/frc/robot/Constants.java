@@ -18,6 +18,8 @@ public class Constants {
 
     public static final class Drive {
 
+        public static final int currentlimit = 40;
+
         public static final double kTrackWidth = Units.inchesToMeters(21);
         // Distance between right and left wheels
         public static final double kWheelBase = Units.inchesToMeters(25.5);

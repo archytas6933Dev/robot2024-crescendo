@@ -159,23 +159,6 @@
               "Visuals/Counter clockwise": false
             }
           },
-          "6,2": {
-            "size": [
-              2,
-              2
-            ],
-            "content": {
-              "_type": "Gyro",
-              "_source0": "network_table:///SmartDashboard/target rotation",
-              "_title": "target rotation",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Visuals/Major tick spacing": 45.0,
-              "Visuals/Starting angle": 180.0,
-              "Visuals/Show tick mark ring": true,
-              "Visuals/Counter clockwise": false
-            }
-          },
           "7,4": {
             "size": [
               1,
@@ -426,19 +409,6 @@
               "imageHeight": -1
             }
           },
-          "0,5": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Toggle Switch",
-              "_source0": "network_table:///SmartDashboard/kill auto",
-              "_title": "kill auto",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
           "5,2": {
             "size": [
               1,
@@ -481,6 +451,36 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "6,2": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Gyro",
+              "_source0": "network_table:///SmartDashboard/target rotation",
+              "_title": "SmartDashboard/target rotation",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Visuals/Major tick spacing": 45.0,
+              "Visuals/Starting angle": 180.0,
+              "Visuals/Show tick mark ring": true,
+              "Visuals/Counter clockwise": false
+            }
+          },
+          "0,5": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Toggle Switch",
+              "_source0": "network_table:///SmartDashboard/Fourth note",
+              "_title": "Fourth note",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -495,7 +495,34 @@
         "hgap": 16.0,
         "vgap": 16.0,
         "titleType": 0,
-        "tiles": {}
+        "tiles": {
+          "3,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Shot Speed",
+              "_title": "SmartDashboard/Shot Speed",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "5,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Tilt position",
+              "_title": "SmartDashboard/Tilt position",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          }
+        }
       }
     }
   ],
