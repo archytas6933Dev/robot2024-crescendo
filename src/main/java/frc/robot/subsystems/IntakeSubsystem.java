@@ -40,7 +40,7 @@ public class IntakeSubsystem extends SubsystemBase{
     return isGrabbed() || isShotReady();
   }
   public boolean isShotReady(){
-    if(!feedSwitch.get()){
+    if(feedSwitch.get()){
       lastShotReady  = curTime;
     }
     if(lastShotReady +Constants.Intake.SHOT_STALE<curTime){

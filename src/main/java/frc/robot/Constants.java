@@ -140,22 +140,22 @@ public class Constants {
 
         public static final double TILT_THRESHOLD = 100;
 
-        public static final double TILT_LOW = 270000;
-        public static final double TILT_MEDIUM = 200000; // 250000
-        public static final double TILT_HIGH = 150000;
+        public static final double TILT_LOW = 310000;
+        public static final double TILT_MEDIUM = 240000; // 250000
+        public static final double TILT_HIGH = 190000; // 150000;
         public static final double TILT_CLIMB = 50000;//100000
-        public static final double TILT_AMP = 208260;
+        public static final double TILT_AMP = 265000;
 
 
         public static final double HIGH_OFFSET = -11;
         public static final double MEDIUM_OFFSET = -6; // -3.0; //-1.5
-        public static final double LOW_OFFSET = 6; // 3; // 4;
+        public static final double LOW_OFFSET = 5.7; // 3; // 4;
 
 
 
         public static final double SHOT_SHORT = 10000;
         public static final double SHOT_MEDIUM = 14000;
-        public static final double SHOT_AMP = 5200; //maybe 5000
+        public static final double SHOT_AMP = 4500; // 5000; //maybe 5000
         public static final double AUTO_SHOT_Y = -8; //-14
 
         public static final double XDeadband = 2; //3

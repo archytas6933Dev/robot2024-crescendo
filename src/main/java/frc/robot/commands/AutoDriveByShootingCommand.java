@@ -96,7 +96,7 @@ private SlewRateLimiter xLimiter,yLimiter;
         }
       }
     }
-    double turnSpeed = swerveSubsystem.turnForAngle(sensorSubsystem.getTargetRotation());
+    double turnSpeed = swerveSubsystem.turnForAngle(sensorSubsystem.getTargetRotation()) / 2;
     xSpeed = xLimiter.calculate(xSpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
     ySpeed = yLimiter.calculate(ySpeed) * Drive.kTeleDriveMaxSpeedMetersPerSecond;
 

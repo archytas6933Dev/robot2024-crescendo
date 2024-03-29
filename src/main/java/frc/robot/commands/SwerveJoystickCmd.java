@@ -121,6 +121,7 @@ public class SwerveJoystickCmd extends Command
     
     double intakeAxis = operatorJoystick.getRawAxis(Control.LEFT_Y_AXIS);
     double shooterAxis = operatorJoystick.getRawAxis(Control.LEFT_TRIGGER);
+    double ampAxis = operatorJoystick.getRawAxis(Control.RIGHT_TRIGGER);
     double climbAxis = operatorJoystick.getRawAxis(Control.RIGHT_Y_AXIS);
     int tiltAxis = operatorJoystick.getPOV();
     // double feedAxis = operatorJoystick.getRawAxis(Control.RIGHT_TRIGGER);
@@ -188,6 +189,14 @@ public class SwerveJoystickCmd extends Command
           isShooting = true;
         }
       }
+      else if (ampAxis > 0.5) {
+        shotSpeed = Constants.Shooter.SHOT_AMP;
+        shooterSubsystem.setTiltPosition(Constants.Shooter.TILT_AMP);
+        if (shooterSubsystem.isReady() || isShooting) {
+          intakeSpeed = Intake.FEED_SPEED;
+          isShooting = true;
+        }
+      }
       else{
         isShooting = false;
       }
@@ -204,7 +213,7 @@ public class SwerveJoystickCmd extends Command
         yTurn = -yTurn;
       }
       double targetangle = Math.toDegrees(Math.atan2(xTurn,-yTurn)) % 360;
-      targetangle = (double)((((int)targetangle + 15) / 30) * 30);
+      // targetangle = (double)((((int)targetangle + 15) / 30) * 30); // 30-degree increments
       sensorSubsystem.setTargetRotation(targetangle);
     }
 

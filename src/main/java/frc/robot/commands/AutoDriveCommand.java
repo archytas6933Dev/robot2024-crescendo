@@ -105,6 +105,8 @@ public class AutoDriveCommand extends Command {
   @Override
   public boolean isFinished() {
 
+//    if (sensorSubsystem.isTargetClose() && intakeSubsystem.isShotReady())
+
     return position.getTranslation().getDistance(swerveSubsystem.getPos().getTranslation())>=distance;
   }
 }
