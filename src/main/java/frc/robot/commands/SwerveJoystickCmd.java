@@ -164,13 +164,14 @@ public class SwerveJoystickCmd extends Command
     }
     else if(operatorJoystick.getRawButton(Control.YBUTTON)){
       shooterSubsystem.tiltUp();
+      shooterSubsystem.zero();
     }
     else shooterSubsystem.tiltStop();
 
     double intakeSpeed = 0;
     double shotSpeed = 0;
 
-      if(intakeAxis<-0.5 && !intakeSubsystem.isShotReady()){
+      if(intakeAxis<-0.5 && (!intakeSubsystem.isShotReady() || operatorJoystick.getRawButton(Control.LBBUTTON))){
         intakeSpeed=Constants.Intake.INTAKE_SPEED;
       }
       else if(intakeAxis>0.5){

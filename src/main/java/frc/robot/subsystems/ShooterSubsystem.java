@@ -131,15 +131,19 @@ public class ShooterSubsystem extends SubsystemBase {
   {
     tilt_.setSelectedSensorPosition(sensorpos);
   }
-
+  public void zero(){
+    if(tilt_.isRevLimitSwitchClosed() == 0) {
+      initializeTiltPosition(0);
+    }
+  }
   @Override
   public void periodic() {
     // if(tilt_.isFwdLimitSwitchClosed() == 0){
     //   tilt_.setSelectedSensorPosition(0);
     // }
-    if(tilt_.isRevLimitSwitchClosed() == 0) {
-      initializeTiltPosition(0);
-    }
+    // if(tilt_.isRevLimitSwitchClosed() == 0 ) {
+    //   initializeTiltPosition(0);
+    // }
     // This method will be called once per scheduler run
     // SmartDashboard.putNumber("requested speed", requestedSpeed);
     SmartDashboard.putBoolean("Can Shoot", isReady());
