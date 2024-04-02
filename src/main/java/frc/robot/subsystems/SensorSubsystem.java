@@ -45,6 +45,9 @@ public class SensorSubsystem extends SubsystemBase {
   public double noteTargetY;
   public double shotTargetX;
   public double shotTargetY;
+  public double ampTargetX;
+  public double ampTargetY;
+  public double ampTargetAngle;
 
   public double currentRobotX;
   public double currentRobotY;
@@ -54,11 +57,13 @@ public class SensorSubsystem extends SubsystemBase {
   private boolean isTagsClose;
   private boolean canSeeNote;
   private boolean atLeastOneTarget= false;
+  private boolean isAmpVisible = false;
   private double targetRotation = 0;
   private long curTime = 0;
 
   private long lastSawNote = 0;
   private long lastSawTarget = 0;
+  private long lastSawAmp = 0;
   public boolean isRed;
   private double targetYOffset = 0;
 
@@ -116,6 +121,11 @@ public class SensorSubsystem extends SubsystemBase {
     // return false;
     return isAtLeastOneTag() && shotTargetY>Constants.Shooter.AUTO_SHOT_Y ;
 
+  }
+
+  public boolean isAmpClose() 
+  {
+    return isAmpVisible && (ampTargetY >= Shooter.CLOSE_AMP_THRESHOLD);
   }
 
   public boolean isNoteClose(){
@@ -192,7 +202,11 @@ public class SensorSubsystem extends SubsystemBase {
     }
     canSeeNote = noteTargetX!=0 || noteTargetY!=0;
 
-
+    if (lastSawAmp < curTime - Constants.Shooter.AMP_STALE) {
+      ampTargetX = Double.NaN;
+      ampTargetY = Double.NaN;
+      isAmpVisible = false;
+    }
 
     NetworkTableEntry position = shooterTable.getEntry("botpose");
     double[] botpose = position.getDoubleArray(new double[1]);
@@ -223,15 +237,19 @@ public class SensorSubsystem extends SubsystemBase {
           if (distance > farthestmarker) farthestmarker = distance;
         }
         //speaker
-        if((tagNum==4 && isRed) || (tagNum == 7 && !isRed)){
+        if((tagNum == 4 && isRed) || (tagNum == 7 && !isRed)){
           atLeastOneTarget = true;
           shotTargetX = tag.path("tx").asDouble();
           shotTargetY = tag.path("ty").asDouble()+targetYOffset;
           lastSawTarget = curTime;
         }
         //amp
-        if(tagNum == 5 || tagNum == 6){
-
+        if(((tagNum == 5) && isRed) || ((tagNum == 6) && !isRed)){
+          isAmpVisible = true;
+          ampTargetX = tag.path("tx").asDouble();
+          ampTargetY = tag.path("ty").asDouble();
+          ampTargetAngle = shooterTable.getEntry("ta").getDouble(0);
+          lastSawAmp = curTime;
         }
       }
 

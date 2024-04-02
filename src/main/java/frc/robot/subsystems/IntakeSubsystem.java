@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -35,6 +36,8 @@ public class IntakeSubsystem extends SubsystemBase{
     motor_.config_kP(1, Constants.Intake.MOTOR_VELOCITY_P);
     motor_.config_kI(1, Constants.Intake.MOTOR_VELOCITY_I);
     motor_.config_kD(1, Constants.Intake.MOTOR_VELOCITY_D);
+
+    motor_.setNeutralMode(NeutralMode.Brake);
   }
   public boolean hasNote(){
     return isGrabbed() || isShotReady();
@@ -66,9 +69,11 @@ public class IntakeSubsystem extends SubsystemBase{
     }
 
     if(speed == 0){
-      motor_.setSelectedSensorPosition(0);
-      motor_.selectProfileSlot(0, 0);
-      motor_.set(ControlMode.Position, 0);
+      // motor_.setSelectedSensorPosition(0);
+      // motor_.selectProfileSlot(0, 0);
+      // motor_.set(ControlMode.Position, 0);
+
+      motor_.set(ControlMode.PercentOutput, 0);
     }
     else{
       motor_.selectProfileSlot(1, 0);

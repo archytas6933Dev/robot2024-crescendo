@@ -144,7 +144,7 @@ public class Constants {
         public static final double TILT_MEDIUM = 240000; // 250000
         public static final double TILT_HIGH = 190000; // 150000;
         public static final double TILT_CLIMB = 50000;//100000
-        public static final double TILT_AMP = 265000;
+        public static final double TILT_AMP = 260000; // 265000
 
 
         public static final double HIGH_OFFSET = -11;
@@ -155,8 +155,11 @@ public class Constants {
 
         public static final double SHOT_SHORT = 10000;
         public static final double SHOT_MEDIUM = 14000;
-        public static final double SHOT_AMP = 4500; // 5000; //maybe 5000
+        public static final double SHOT_AMP = 5000; // 4500;
         public static final double AUTO_SHOT_Y = -8; //-14
+
+        public static final double CLOSE_AMP_THRESHOLD = 10;
+        public static final double AMP_STALE = 100;
 
         public static final double XDeadband = 2; //3
         public static final double YDeadband = 2; //3
@@ -167,7 +170,8 @@ public class Constants {
 
         public static final double kSVolts = 0;
         public static final double kVVoltSecondsPerRotation = 0;
-                public static final double CLOSE_TAG_THRESHOLD = 4;
+
+        public static final double CLOSE_TAG_THRESHOLD = 4;
 
 
     }
@@ -175,8 +179,8 @@ public class Constants {
         public static final boolean EXISTS = true;
         public static final int MOTOR_ID = 51;
         public static final double MOTOR_POSITION_F = 0.0;
-        public static final double MOTOR_POSITION_P = 0.25;
-        public static final double MOTOR_POSITION_I = 0.0;
+        public static final double MOTOR_POSITION_P = 0.10; // 25;
+        public static final double MOTOR_POSITION_I = 0.001;
         public static final double MOTOR_POSITION_D = 5.0;
 
        public static final double MOTOR_VELOCITY_F = 0.055; //0.011;

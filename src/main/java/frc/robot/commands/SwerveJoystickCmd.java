@@ -44,6 +44,9 @@ public class SwerveJoystickCmd extends Command
   private long shotTimer = -1;
   private long intakeTimer = -1;
   private boolean isClimbing = false;
+
+  private boolean isAmping = false;
+  private long ampTimer = -1;
   
   public SwerveJoystickCmd(
     Joystick driverJoystick, 
@@ -98,6 +101,7 @@ public class SwerveJoystickCmd extends Command
 
     boolean isAutoShoot = false;
     boolean isAutoIntake = false;
+    boolean isAutoAmp = false;
     if(autoMode && sensorSubsystem.isNoteClose() && !intakeSubsystem.hasNote() && !isShooting){
       isAutoIntake = true;
     }
@@ -109,6 +113,14 @@ public class SwerveJoystickCmd extends Command
     if(shotTimer>0){
       isAutoShoot = true;
     }
+
+    if (autoMode && sensorSubsystem.isAmpClose() && intakeSubsystem.isShotReady()) {
+      isAutoAmp = true;
+    }
+    if (ampTimer > 0) {
+      isAutoAmp = true;
+    }
+
     double inversion = sensorSubsystem.isRed?1:-1;
     double xSpeed = driverJoystick.getRawAxis(Control.LEFT_X_AXIS) * inversion;
     double ySpeed = -driverJoystick.getRawAxis(Control.LEFT_Y_AXIS) * inversion;
@@ -317,6 +329,43 @@ public class SwerveJoystickCmd extends Command
     if(autoMode && sensorSubsystem.isTargetClose() && intakeSubsystem.hasNote()){
       shotSpeed=Constants.Shooter.SHOT_MEDIUM;
     }
+
+    if (isAutoAmp) {
+      isFieldCentric = false;
+      shooterSubsystem.setTiltPosition(Shooter.TILT_AMP);
+      if (sensorSubsystem.isAmpClose()) {
+        xSpeed = -sensorSubsystem.ampTargetX / 60;
+        ySpeed = -0.25;
+        // turnSpeed = sensorSubsystem.ampTargetAngle / 50;
+      }
+      else {
+        xSpeed = 0;
+        ySpeed = -0.15;
+      }
+      turnSpeed = 0;
+
+      if (ampTimer == -1) {
+        ampTimer = sensorSubsystem.getTime();
+      }
+      else {
+        double duration = sensorSubsystem.getTime() - ampTimer;
+        if (duration > 2000) {
+          isAmping = true;
+          shotSpeed = Shooter.SHOT_AMP;
+          if (shooterSubsystem.isReady())
+            intakeSpeed = Intake.FEED_SPEED;
+        }
+        if ((duration > 2500) || !autoMode) { // allow abort here if necessary
+          shotSpeed = 0;
+          intakeSpeed = 0;
+          ampTimer = -1;
+          isAmping = false;
+          shooterSubsystem.setTiltPosition(Shooter.TILT_MEDIUM);
+        }
+      }
+
+    }
+
     // else if (pov == Control.DAXISS) {
     //   // turnSpeed = sensorSubsystem.targetX/80;    
     //   // turnSpeed = Math.abs(turnSpeed) > Control.kDeadband ? turnSpeed : 0.0;
